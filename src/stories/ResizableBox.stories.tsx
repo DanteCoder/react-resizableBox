@@ -1,7 +1,6 @@
 import React from 'react';
-import { ResizableBox } from '..';
 import { useState } from 'react';
-import { ResizableBoxProps } from '../components/ResizableBox';
+import { ResizableBox, ResizableBoxProps } from '../components/ResizableBox';
 
 export default {
   component: ResizableBox,
