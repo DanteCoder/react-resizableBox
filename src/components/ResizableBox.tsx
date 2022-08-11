@@ -8,7 +8,7 @@ import { Rectangle } from './Rectangle';
 import { MoveHandler } from './MoveHandler';
 import { ResizeHandler } from './ResizeHandler';
 import { RotateHandler } from './RotateHandler';
-import './ResizableBox.css';
+import styles from './ResizableBox.module.css';
 
 export interface ResizableBoxProps {
   width: number;
@@ -111,7 +111,7 @@ export const ResizableBox = (props: ResizableBoxProps) => {
 
   return (
     <div
-      className={classnames('mainContainer', props.className)}
+      className={classnames(styles.mainContainer, props.className)}
       style={{
         left,
         top,

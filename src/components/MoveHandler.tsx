@@ -1,7 +1,7 @@
 import React, { MouseEventHandler, useEffect } from 'react';
 import { OnDragMouseDown } from '../types';
 import MoveArrows from '../icons/MoveArrows.svg';
-import './ResizableBox.css';
+import styles from './ResizableBox.module.css';
 
 interface Props {
   left: number;
@@ -43,7 +43,7 @@ export const MoveHandler = (props: Props) => {
   return (
     <div
       onMouseDown={draggable ? onMouseDownHandler : undefined}
-      className={'moveHandler'}
+      className={styles.moveHandler}
       style={{
         left,
         top,

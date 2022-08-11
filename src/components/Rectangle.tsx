@@ -1,6 +1,6 @@
 import React, { CSSProperties, MouseEventHandler, useEffect } from 'react';
 import { OnDragMouseDown } from '../types';
-import './ResizableBox.css';
+import styles from './ResizableBox.module.css';
 
 interface Props {
   width: number;
@@ -32,7 +32,7 @@ export const Rectangle = (props: Props) => {
       onMouseDown={draggable ? onMouseDown : undefined}
       onClick={props.onClick}
       onDoubleClick={props.onDoubleClick}
-      className={'rectangle'}
+      className={styles.rectangle}
       style={{
         width,
         height,

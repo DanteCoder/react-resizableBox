@@ -1,7 +1,7 @@
 import React, { MouseEventHandler } from 'react';
 import { OnRotateMouseDown } from '../types';
 import RotateArrow from '../icons/RotateArrow.svg';
-import './ResizableBox.css';
+import styles from './ResizableBox.module.css';
 
 interface Props {
   left: number;
@@ -31,7 +31,7 @@ export const RotateHandler = (props: Props) => {
   return (
     <div
       onMouseDown={onMouseDownHandler}
-      className={'rotateHandler'}
+      className={styles.rotateHandler}
       style={{
         left,
         top,
@@ -39,7 +39,6 @@ export const RotateHandler = (props: Props) => {
       }}
     >
       <img src={RotateArrow} alt="Rotate" />
-      {/* <RotateArrow /> */}
     </div>
   );
 };
