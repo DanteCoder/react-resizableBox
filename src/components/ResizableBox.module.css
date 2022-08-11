@@ -3,7 +3,7 @@
 }
 
 .rectangle {
-  box-shadow: 0 0 0 1px;
+  box-shadow: inset 0 0 0 1px;
   color: rgba(30, 70, 255, 1);
   cursor: grab;
 }
