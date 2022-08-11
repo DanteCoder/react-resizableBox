@@ -45,15 +45,7 @@ const useResize = (props: Props) => {
           deltaY: (clientY - startPos.current.y) / scale,
         };
 
-        const newStyle = getNewStyle(
-          handlerType.current,
-          startStyles.current,
-          delta,
-          minWidth,
-          minHeight,
-          aspectRatio || e.shiftKey,
-          e.altKey
-        );
+        const newStyle = getNewStyle(handlerType.current, startStyles.current, delta, minWidth, minHeight, aspectRatio || e.shiftKey, e.altKey);
 
         props.onResize?.(newStyle);
       };

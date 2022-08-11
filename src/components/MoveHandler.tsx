@@ -2,6 +2,7 @@ import React, { MouseEventHandler, useEffect } from 'react';
 import { OnDragMouseDown } from '../types';
 import MoveArrows from '../icons/MoveArrows.svg';
 import styles from './ResizableBox.module.css';
+import { CSSProperties } from 'react';
 
 interface Props {
   left: number;
@@ -10,10 +11,11 @@ interface Props {
   draggable: boolean;
   isDragging: boolean;
   onMouseDown: OnDragMouseDown;
+  svgFilter?: CSSProperties['filter'];
 }
 
 export const MoveHandler = (props: Props) => {
-  const { left, top, rotationDeg, draggable, isDragging, onMouseDown } = props;
+  const { left, top, rotationDeg, draggable, isDragging, onMouseDown, svgFilter } = props;
 
   useEffect(() => {
     if (!isDragging) return;
@@ -50,7 +52,7 @@ export const MoveHandler = (props: Props) => {
         transform: `translate(-50%, -50%) rotate(${-rotationDeg}deg)`,
       }}
     >
-      <img src={MoveArrows} alt="Move" />
+      <img style={{ filter: svgFilter }} src={MoveArrows} alt="Move" />
     </div>
   );
 };

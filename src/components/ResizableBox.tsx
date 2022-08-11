@@ -18,6 +18,8 @@ export interface ResizableBoxProps {
   rotationDeg?: number;
   scale?: number;
   style?: CSSProperties;
+  color?: CSSProperties['color'];
+  svgFilter?: CSSProperties['filter'];
   className?: string;
   draggable?: boolean;
   dragHandler?: boolean;
@@ -52,6 +54,8 @@ export const ResizableBox = (props: ResizableBoxProps) => {
     rotationDeg = 0,
     scale = 1,
     style,
+    color,
+    svgFilter,
     draggable = true,
     resizable = true,
     aspectRatio,
@@ -128,7 +132,7 @@ export const ResizableBox = (props: ResizableBoxProps) => {
         isDragging={isDragging}
         height={height}
         width={width}
-        style={{ ...statefulStyle }}
+        style={{ ...statefulStyle, color }}
         onClick={props.onClick}
         onDoubleClick={props.onDoubleClick}
       />
@@ -140,27 +144,23 @@ export const ResizableBox = (props: ResizableBoxProps) => {
           left={width / 2}
           top={20 + height + topOffset}
           rotationDeg={rotationDeg}
+          svgFilter={svgFilter}
         />
       )}
       {resizable && (
         <>
-          <ResizeHandler type="nw" onMouseDown={onResizeMouseDown} left={0 - leftOffset} top={0 - topOffset} />
-          <ResizeHandler type="n" onMouseDown={onResizeMouseDown} left={width / 2} top={0 - topOffset} />
-          <ResizeHandler type="ne" onMouseDown={onResizeMouseDown} left={width + leftOffset} top={0 - topOffset} />
-          <ResizeHandler type="w" onMouseDown={onResizeMouseDown} left={0 - leftOffset} top={height / 2} />
-          <ResizeHandler type="e" onMouseDown={onResizeMouseDown} left={width + leftOffset} top={height / 2} />
-          <ResizeHandler type="sw" onMouseDown={onResizeMouseDown} left={0 - leftOffset} top={height + topOffset} />
-          <ResizeHandler type="s" onMouseDown={onResizeMouseDown} left={width / 2} top={height + topOffset} />
-          <ResizeHandler type="se" onMouseDown={onResizeMouseDown} left={width + leftOffset} top={height + topOffset} />
+          <ResizeHandler color={color} type="nw" onMouseDown={onResizeMouseDown} left={0 - leftOffset} top={0 - topOffset} />
+          <ResizeHandler color={color} type="n" onMouseDown={onResizeMouseDown} left={width / 2} top={0 - topOffset} />
+          <ResizeHandler color={color} type="ne" onMouseDown={onResizeMouseDown} left={width + leftOffset} top={0 - topOffset} />
+          <ResizeHandler color={color} type="w" onMouseDown={onResizeMouseDown} left={0 - leftOffset} top={height / 2} />
+          <ResizeHandler color={color} type="e" onMouseDown={onResizeMouseDown} left={width + leftOffset} top={height / 2} />
+          <ResizeHandler color={color} type="sw" onMouseDown={onResizeMouseDown} left={0 - leftOffset} top={height + topOffset} />
+          <ResizeHandler color={color} type="s" onMouseDown={onResizeMouseDown} left={width / 2} top={height + topOffset} />
+          <ResizeHandler color={color} type="se" onMouseDown={onResizeMouseDown} left={width + leftOffset} top={height + topOffset} />
         </>
       )}
       {rotatable && (
-        <RotateHandler
-          onMouseDown={onRotateMouseDown}
-          left={width / 2}
-          top={-20 - topOffset}
-          rotationDeg={rotationDeg}
-        />
+        <RotateHandler onMouseDown={onRotateMouseDown} left={width / 2} top={-20 - topOffset} rotationDeg={rotationDeg} svgFilter={svgFilter} />
       )}
     </div>
   );
