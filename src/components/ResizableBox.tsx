@@ -88,10 +88,10 @@ export const ResizableBox = (props: ResizableBoxProps) => {
   });
   const [, onResizeMouseDown] = useResize({
     styles: {
-      width,
-      height,
       left,
       top,
+      width,
+      height,
       rotationDeg,
     },
     scale,

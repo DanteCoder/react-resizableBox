@@ -101,7 +101,7 @@ const useResize = (props: Props) => {
 
 const getNewStyle = (
   type: ResizeHandlerType,
-  initStyle: { top: number; left: number; width: number; height: number; rotationDeg: number },
+  initStyle: StylePos & StyleSize & StyleRot,
   mouseDelta: DeltaPos,
   minWidth: number,
   minHeight: number,
