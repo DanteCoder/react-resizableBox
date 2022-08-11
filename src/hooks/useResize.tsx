@@ -1,61 +1,93 @@
 import { useCallback } from 'react';
 import { useRef } from 'react';
-import { HandlerType, OnResize, OnResizeMouseDown } from '../types';
+import {
+  DeltaPos,
+  DeltaSize,
+  ResizeHandlerType,
+  OnResizeHandler,
+  OnResizeEndHandler,
+  OnResizeMouseDown,
+  OnResizeStartHandler,
+  StylePos,
+  StyleRot,
+  StyleSize,
+} from '../types';
 import { center2TopLeft, deg2Rad, deltaLength, topLeft2Center, vectorAngle } from '../utils';
 
 interface Props {
-  styles: {
-    left: number;
-    top: number;
-    width: number;
-    height: number;
-    rotationDeg: number;
-  };
+  styles: StylePos & StyleSize & StyleRot;
   scale: number;
   minWidth?: number;
   minHeight?: number;
   aspectRatio?: boolean | number;
-  onResizeStart?: VoidFunction;
-  onResize?: OnResize;
-  onResizeEnd?: VoidFunction;
+  onResizeStart?: OnResizeStartHandler;
+  onResize?: OnResizeHandler;
+  onResizeEnd?: OnResizeEndHandler;
 }
 
 const useResize = (props: Props) => {
   const { styles, scale, minWidth = 10, minHeight = 10, aspectRatio = false } = props;
   const isMouseDown = useRef(false);
-  const handlerType = useRef<HandlerType>('n');
-  const startPos = useRef({ x: 0, y: 0 });
-  const startStyles = useRef(styles);
+  const isResizing = useRef(false);
+  const handlerType = useRef<ResizeHandlerType>('n');
+  const startMousePos = useRef({ x: 0, y: 0 });
+  const startStyle = useRef(styles);
+  const prevStyle = useRef<StylePos & StyleSize>(styles);
+  const stylesTotalDelta = useRef<DeltaPos & DeltaSize>({ x: 0, y: 0, w: 0, h: 0 });
 
   const onMouseDown: OnResizeMouseDown = useCallback(
     (e, type) => {
       isMouseDown.current = true;
       handlerType.current = type;
-      startPos.current = { x: e.clientX, y: e.clientY };
-      startStyles.current = styles;
-      props.onResizeStart?.();
+      startMousePos.current = { x: e.clientX, y: e.clientY };
+
+      startStyle.current = styles;
+      prevStyle.current = styles;
+
+      stylesTotalDelta.current = { x: 0, y: 0, w: 0, h: 0 };
 
       const onMouseMove = (e: MouseEvent) => {
         if (!isMouseDown.current) return;
+        e.preventDefault();
         e.stopImmediatePropagation();
         const { clientX, clientY } = e;
 
-        const delta = {
-          deltaX: (clientX - startPos.current.x) / scale,
-          deltaY: (clientY - startPos.current.y) / scale,
+        if (!isResizing.current) props.onResizeStart?.();
+        isResizing.current = true;
+
+        const mouseDelta = {
+          x: (clientX - startMousePos.current.x) / scale,
+          y: (clientY - startMousePos.current.y) / scale,
         };
 
-        const newStyle = getNewStyle(handlerType.current, startStyles.current, delta, minWidth, minHeight, aspectRatio || e.shiftKey, e.altKey);
+        const newStyle = getNewStyle(handlerType.current, startStyle.current, mouseDelta, minWidth, minHeight, aspectRatio || e.shiftKey, e.altKey);
 
-        props.onResize?.(newStyle);
+        const stylesDelta: DeltaPos & DeltaSize = {
+          x: newStyle.left - prevStyle.current.left,
+          y: newStyle.top - prevStyle.current.top,
+          w: newStyle.width - prevStyle.current.width,
+          h: newStyle.height - prevStyle.current.height,
+        };
+
+        prevStyle.current = newStyle;
+
+        stylesTotalDelta.current = {
+          x: newStyle.left - startStyle.current.left,
+          y: newStyle.top - startStyle.current.top,
+          w: newStyle.width - startStyle.current.width,
+          h: newStyle.height - startStyle.current.height,
+        };
+
+        props.onResize?.({ style: newStyle, delta: stylesDelta, totalDelta: stylesTotalDelta.current });
       };
 
       const onMouseUp = (_e: MouseEvent) => {
         if (!isMouseDown.current) return;
-        isMouseDown.current = false;
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
-        props.onResizeEnd?.();
+        if (isResizing.current) props.onResizeEnd?.({ style: prevStyle.current, totalDelta: stylesTotalDelta.current });
+        isMouseDown.current = false;
+        isResizing.current = false;
       };
 
       document.addEventListener('mouseup', onMouseUp);
@@ -68,16 +100,16 @@ const useResize = (props: Props) => {
 };
 
 const getNewStyle = (
-  type: HandlerType,
+  type: ResizeHandlerType,
   initStyle: { top: number; left: number; width: number; height: number; rotationDeg: number },
-  delta: { deltaX: number; deltaY: number },
+  mouseDelta: DeltaPos,
   minWidth: number,
   minHeight: number,
   aspectRatio: boolean | number,
   symetrical: boolean
-) => {
-  const deltaL = deltaLength(delta.deltaX, delta.deltaY);
-  const alpha = vectorAngle(delta.deltaX, delta.deltaY);
+): StylePos & StyleSize => {
+  const deltaL = deltaLength(mouseDelta.x, mouseDelta.y);
+  const alpha = vectorAngle(mouseDelta.x, mouseDelta.y);
   const rotationRad = deg2Rad(initStyle.rotationDeg);
   const relativeAngle = alpha - rotationRad;
 

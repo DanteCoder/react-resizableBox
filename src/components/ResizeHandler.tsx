@@ -1,11 +1,11 @@
 import React, { CSSProperties, MouseEventHandler } from 'react';
-import { HandlerType, OnResizeMouseDown } from '../types';
+import { ResizeHandlerType, OnResizeMouseDown } from '../types';
 import styles from './ResizableBox.module.css';
 
 interface Props {
   left: number;
   top: number;
-  type: HandlerType;
+  type: ResizeHandlerType;
   color?: CSSProperties['color'];
   onMouseDown?: OnResizeMouseDown;
 }

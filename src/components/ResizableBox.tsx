@@ -1,5 +1,15 @@
 import React, { CSSProperties, MouseEventHandler, useMemo } from 'react';
-import { OnDrag, OnDragEnd, OnResize, OnRotate } from '../types';
+import {
+  OnDragHandler,
+  OnDragEndHandler,
+  OnResizeHandler,
+  OnRotateHandler,
+  OnDragStartHandler,
+  OnResizeStartHandler,
+  OnResizeEndHandler,
+  OnRotateStartHandler,
+  OnRotateEndHandler,
+} from '../types';
 import classnames from 'classnames';
 import useDrag from '../hooks/useDrag';
 import useResize from '../hooks/useResize';
@@ -28,22 +38,21 @@ export interface ResizableBoxProps {
   rotatable?: boolean;
   minWidth?: number;
   minHeight?: number;
+  handlersSpaceOut?: number;
   onClick?: MouseEventHandler<HTMLDivElement>;
   onDoubleClick?: MouseEventHandler<HTMLDivElement>;
   onMouseOver?: VoidFunction;
   onMouseLeave?: VoidFunction;
-  onDragStart?: VoidFunction;
-  onDrag?: OnDrag;
-  onDragEnd?: OnDragEnd;
-  onResizeStart?: VoidFunction;
-  onResize?: OnResize;
-  onResizeEnd?: VoidFunction;
-  onRotateStart?: VoidFunction;
-  onRotate?: OnRotate;
-  onRotateEnd?: OnRotate;
+  onDragStart?: OnDragStartHandler;
+  onDrag?: OnDragHandler;
+  onDragEnd?: OnDragEndHandler;
+  onResizeStart?: OnResizeStartHandler;
+  onResize?: OnResizeHandler;
+  onResizeEnd?: OnResizeEndHandler;
+  onRotateStart?: OnRotateStartHandler;
+  onRotate?: OnRotateHandler;
+  onRotateEnd?: OnRotateEndHandler;
 }
-
-export const spaceThreshold = 50;
 
 export const ResizableBox = (props: ResizableBoxProps) => {
   const {
@@ -62,10 +71,11 @@ export const ResizableBox = (props: ResizableBoxProps) => {
     rotatable = true,
     minWidth,
     minHeight,
+    handlersSpaceOut = 50,
   } = props;
 
-  const leftOffset = width < spaceThreshold ? (spaceThreshold - width) / 2 : 0;
-  const topOffset = height < spaceThreshold ? (spaceThreshold - height) / 2 : 0;
+  const leftOffset = width < handlersSpaceOut ? (handlersSpaceOut - width) / 2 : 0;
+  const topOffset = height < handlersSpaceOut ? (handlersSpaceOut - height) / 2 : 0;
   const [, isDragging, onDragMouseDown] = useDrag({
     styles: {
       left,

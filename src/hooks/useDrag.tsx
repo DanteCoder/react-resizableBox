@@ -1,16 +1,13 @@
 import { useCallback, useState } from 'react';
 import { MouseEventHandler, useRef } from 'react';
-import { OnDrag, OnDragEnd } from '../types';
+import { DeltaPos, OnDragHandler, OnDragEndHandler, OnDragStartHandler, StylePos } from '../types';
 
 interface Props {
-  styles: {
-    left: number;
-    top: number;
-  };
+  styles: StylePos;
   scale: number;
-  onDragStart?: VoidFunction;
-  onDrag?: OnDrag;
-  onDragEnd?: OnDragEnd;
+  onDragStart?: OnDragStartHandler;
+  onDrag?: OnDragHandler;
+  onDragEnd?: OnDragEndHandler;
 }
 
 const useDrag = (props: Props) => {
@@ -18,23 +15,26 @@ const useDrag = (props: Props) => {
   const isMouseDown = useRef(false);
   const isDragging = useRef(false);
   const [isDraggingState, setIsDraggingState] = useState(false);
-  const startPos = useRef({ x: 0, y: 0 });
-  const prevPos = useRef({ x: 0, y: 0 });
+  const startMousePos = useRef({ x: 0, y: 0 });
+  const prevMousePos = useRef({ x: 0, y: 0 });
   const startStyles = useRef(styles);
   const newStyle = useRef(styles);
-  const totalDelta = useRef({ deltaX: 0, deltaY: 0 });
+  const totalPosDelta = useRef<DeltaPos>({ x: 0, y: 0 });
 
   const onMouseDown: MouseEventHandler<HTMLDivElement> = useCallback(
     (e) => {
       isMouseDown.current = true;
-      startPos.current = { x: e.clientX, y: e.clientY };
-      prevPos.current = startPos.current;
+      startMousePos.current = { x: e.clientX, y: e.clientY };
+      prevMousePos.current = startMousePos.current;
+
       startStyles.current = props.styles;
       newStyle.current = startStyles.current;
-      totalDelta.current = { deltaX: 0, deltaY: 0 };
+
+      totalPosDelta.current = { x: 0, y: 0 };
 
       const onMouseMove = (e: MouseEvent) => {
         if (!isMouseDown.current) return;
+        e.preventDefault();
         e.stopImmediatePropagation();
         const { clientX, clientY } = e;
 
@@ -42,34 +42,34 @@ const useDrag = (props: Props) => {
         isDragging.current = true;
         setIsDraggingState(true);
 
-        const delta = {
-          deltaX: (clientX - prevPos.current.x) / scale,
-          deltaY: (clientY - prevPos.current.y) / scale,
+        const mouseDelta = {
+          x: (clientX - prevMousePos.current.x) / scale,
+          y: (clientY - prevMousePos.current.y) / scale,
         };
 
-        prevPos.current = {
+        prevMousePos.current = {
           x: clientX,
           y: clientY,
         };
 
-        totalDelta.current = {
-          deltaX: (clientX - startPos.current.x) / scale,
-          deltaY: (clientY - startPos.current.y) / scale,
+        totalPosDelta.current = {
+          x: (clientX - startMousePos.current.x) / scale,
+          y: (clientY - startMousePos.current.y) / scale,
         };
 
         newStyle.current = {
-          left: Math.round(startStyles.current.left + totalDelta.current.deltaX),
-          top: Math.round(startStyles.current.top + totalDelta.current.deltaY),
+          left: Math.round(startStyles.current.left + totalPosDelta.current.x),
+          top: Math.round(startStyles.current.top + totalPosDelta.current.y),
         };
 
-        props.onDrag?.({ ...newStyle.current, ...delta });
+        props.onDrag?.({ style: newStyle.current, delta: mouseDelta, totalDelta: totalPosDelta.current });
       };
 
       const onMouseUp = (_e: MouseEvent) => {
         if (!isMouseDown.current) return;
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
-        if (isDragging.current) props.onDragEnd?.({ ...newStyle.current, ...totalDelta.current });
+        if (isDragging.current) props.onDragEnd?.({ style: newStyle.current, totalDelta: totalPosDelta.current });
         isMouseDown.current = false;
         isDragging.current = false;
         setIsDraggingState(false);
