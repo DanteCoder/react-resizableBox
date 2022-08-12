@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import { ResizableBox, ResizableBoxProps } from '../components/ResizableBox';
+import { OnDragHandler, OnResizeHandler, OnRotateHandler } from '../types';
 
 export default {
   component: ResizableBox,
@@ -13,20 +14,20 @@ export const SimpleUseCase = () => {
   const [top, setTop] = useState(100);
   const [angle, setAngle] = useState(0);
 
-  const onDragHandler: ResizableBoxProps['onDrag'] = (e) => {
-    setLeft((prev) => prev + e.deltaX);
-    setTop((prev) => prev + e.deltaY);
+  const onDragHandler: OnDragHandler = (e) => {
+    setLeft(e.style.left);
+    setTop(e.style.top);
   };
 
-  const onResizeHandler: ResizableBoxProps['onResize'] = (e) => {
-    setLeft(e.left);
-    setTop(e.top);
-    setWidth(e.width);
-    setHeight(e.height);
+  const onResizeHandler: OnResizeHandler = (e) => {
+    setLeft(e.style.left);
+    setTop(e.style.top);
+    setWidth(e.style.width);
+    setHeight(e.style.height);
   };
 
-  const onRotateHandler: ResizableBoxProps['onRotate'] = (e) => {
-    setAngle(e);
+  const onRotateHandler: OnRotateHandler = (e) => {
+    setAngle(e.style.rotationDeg);
   };
 
   return (
@@ -43,6 +44,8 @@ export const SimpleUseCase = () => {
         }}
       ></div>
       <ResizableBox
+        color={'red'}
+        svgFilter={'invert(10%) sepia(96%) saturate(3906%) hue-rotate(241deg) brightness(99%) contrast(161%)'}
         dragHandler={true}
         width={width}
         height={height}
