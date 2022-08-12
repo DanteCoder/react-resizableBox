@@ -1,40 +1,26 @@
-import React, { CSSProperties, MouseEventHandler } from 'react';
+import React, { DetailedHTMLProps, MouseEventHandler } from 'react';
 import { OnDragMouseDown } from '../types';
 import { captureClick, LEFT_MOUSE_BUTTON } from '../utils';
 import styles from './ResizableBox.module.css';
 
-interface Props {
-  width: number;
-  height: number;
+interface RectangleProps extends DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   draggable: boolean;
   onDragMouseDown?: OnDragMouseDown;
-  style?: CSSProperties;
   onClick?: MouseEventHandler<HTMLDivElement>;
   onDoubleClick?: MouseEventHandler<HTMLDivElement>;
 }
 
-export const Rectangle = (props: Props) => {
-  const { width, height, draggable, onDragMouseDown } = props;
+export const Rectangle = (props: RectangleProps) => {
+  const { draggable, onDragMouseDown } = props;
 
   const onMouseDownHandler: MouseEventHandler<HTMLDivElement> = (e) => {
     if (e.button !== LEFT_MOUSE_BUTTON) return;
     e.preventDefault();
     e.stopPropagation();
     captureClick();
+    document.body.style.cursor = 'grabbing';
     onDragMouseDown?.(e);
   };
 
-  return (
-    <div
-      onMouseDown={draggable ? onMouseDownHandler : undefined}
-      onClick={props.onClick}
-      onDoubleClick={props.onDoubleClick}
-      className={styles.rectangle}
-      style={{
-        width,
-        height,
-        ...props.style,
-      }}
-    />
-  );
+  return <div className={styles.rectangle} {...props} onMouseDown={draggable ? onMouseDownHandler : undefined} />;
 };

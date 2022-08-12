@@ -5,27 +5,25 @@
 .rectangle {
   box-shadow: inset 0 0 0 1px;
   color: rgba(30, 70, 255, 1);
-  cursor: grab;
 }
 
 .resizeHandler {
+  position: absolute;
   width: 10px;
   height: 10px;
-  position: absolute;
   background-color: white;
   box-shadow: inset 0 0 0 1px;
   color: rgba(30, 70, 255, 1);
   border-radius: 30%;
-  cursor: pointer;
   transform: translate(-50%, -50%);
 }
 
 .rotateHandler {
-  cursor: pointer;
   position: absolute;
   width: 30px;
   height: 30px;
   transform: translate(-50%, -50%);
+  cursor: pointer;
 }
 
 .rotateHandler img {
@@ -35,7 +33,6 @@
 }
 
 .moveHandler {
-  cursor: move;
   position: absolute;
   width: 30px;
   height: 30px;

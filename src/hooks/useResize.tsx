@@ -14,7 +14,7 @@ import {
 } from '../types';
 import { center2TopLeft, deg2Rad, vectorLength, topLeft2Center, vectorAngle } from '../utils';
 
-interface Props {
+interface UseResizeProps {
   styles: StylePos & StyleSize & StyleRot;
   scale: number;
   minWidth?: number;
@@ -25,7 +25,7 @@ interface Props {
   onResizeEnd?: OnResizeEndHandler;
 }
 
-const useResize = (props: Props) => {
+const useResize = (props: UseResizeProps) => {
   const { styles, scale, minWidth = 10, minHeight = 10 } = props;
   const isMouseDown = useRef(false);
   const isResizing = useRef(false);
@@ -94,6 +94,7 @@ const useResize = (props: Props) => {
         if (isResizing.current) props.onResizeEnd?.({ style: prevStyle.current, totalDelta: stylesTotalDelta.current });
         isMouseDown.current = false;
         isResizing.current = false;
+        document.body.style.cursor = 'auto';
       };
 
       document.addEventListener('mouseup', onMouseUp);

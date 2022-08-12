@@ -1,4 +1,4 @@
-import React, { CSSProperties, MouseEventHandler, useRef } from 'react';
+import React, { CSSProperties, DetailedHTMLProps, useRef } from 'react';
 import {
   OnDragHandler,
   OnDragEndHandler,
@@ -19,18 +19,17 @@ import { MoveHandler } from './MoveHandler';
 import { ResizeHandler } from './ResizeHandler';
 import { RotateHandler } from './RotateHandler';
 import styles from './ResizableBox.module.css';
+import { resizeHandlerCursor } from '../utils';
 
-export interface ResizableBoxProps {
+export interface ResizableBoxProps extends Omit<DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>, 'onDrag' | 'onDragEnd'> {
   width: number;
   height: number;
   left: number;
   top: number;
   rotationDeg?: number;
   scale?: number;
-  style?: CSSProperties;
   color?: CSSProperties['color'];
   svgFilter?: CSSProperties['filter'];
-  className?: string;
   draggable?: boolean;
   dragHandler?: boolean;
   resizable?: boolean;
@@ -40,10 +39,6 @@ export interface ResizableBoxProps {
   minWidth?: number;
   minHeight?: number;
   handlersSpaceOut?: number;
-  onClick?: MouseEventHandler<HTMLDivElement>;
-  onDoubleClick?: MouseEventHandler<HTMLDivElement>;
-  onMouseOver?: VoidFunction;
-  onMouseLeave?: VoidFunction;
   onDragStart?: OnDragStartHandler;
   onDrag?: OnDragHandler;
   onDragEnd?: OnDragEndHandler;
@@ -63,7 +58,6 @@ export const ResizableBox = (props: ResizableBoxProps) => {
     top,
     rotationDeg = 0,
     scale = 1,
-    style,
     color,
     svgFilter,
     draggable = true,
@@ -75,15 +69,25 @@ export const ResizableBox = (props: ResizableBoxProps) => {
     minWidth,
     minHeight,
     handlersSpaceOut = 50,
+    onDragStart,
+    onDrag,
+    onDragEnd,
+    onResizeStart,
+    onResize,
+    onResizeEnd,
+    onRotateStart,
+    onRotate,
+    onRotateEnd,
+    ...htmlProps
   } = props;
 
   const resizableRef = useRef<HTMLDivElement>(null);
-  const onDragMouseDown = useDrag({
+  const [onDragMouseDown, isDragging] = useDrag({
     styles: { left, top },
     scale,
-    onDragStart: props.onDragStart,
-    onDrag: props.onDrag,
-    onDragEnd: props.onDragEnd,
+    onDragStart,
+    onDrag,
+    onDragEnd,
   });
   const onResizeMouseDown = useResize({
     styles: { left, top, width, height, rotationDeg },
@@ -91,17 +95,17 @@ export const ResizableBox = (props: ResizableBoxProps) => {
     minHeight,
     minWidth,
     aspectRatio,
-    onResizeStart: props.onResizeStart,
-    onResize: props.onResize,
-    onResizeEnd: props.onResizeEnd,
+    onResizeStart,
+    onResize,
+    onResizeEnd,
   });
   const onRotateMouseDown = useRotate({
     styles: { top, left, width, height, rotationDeg },
     resizableRef,
     snapAngle,
-    onRotateStart: props.onRotateStart,
-    onRotate: props.onRotate,
-    onRotateEnd: props.onRotateEnd,
+    onRotateStart,
+    onRotate,
+    onRotateEnd,
   });
 
   const offsets = {
@@ -109,57 +113,91 @@ export const ResizableBox = (props: ResizableBoxProps) => {
     top: height < handlersSpaceOut ? (handlersSpaceOut - height) / 2 : 0,
   };
 
+  const dragCursor = ((): CSSProperties['cursor'] => {
+    if (!draggable) return 'auto';
+    if (!isDragging) return 'grab';
+    return 'grabbing';
+  })();
+
   return (
     <div
+      {...htmlProps}
+      className={classnames(styles.mainContainer, htmlProps.className)}
       ref={resizableRef}
-      className={classnames(styles.mainContainer, props.className)}
       style={{
         left,
         top,
         overflow: 'visible',
         transform: rotationDeg ? `rotate(${rotationDeg}deg)` : undefined,
-        ...style,
+        ...htmlProps.style,
       }}
-      onMouseOver={props.onMouseOver}
-      onMouseLeave={props.onMouseLeave}
     >
-      <Rectangle
-        onDragMouseDown={onDragMouseDown}
-        draggable={draggable}
-        height={height}
-        width={width}
-        style={{ color }}
-        onClick={props.onClick}
-        onDoubleClick={props.onDoubleClick}
-      />
+      <Rectangle onDragMouseDown={onDragMouseDown} draggable={draggable} style={{ width, height, color, cursor: dragCursor }} />
       {draggable && dragHandler && (
         <MoveHandler
-          onDragMouseDown={onDragMouseDown}
-          left={width / 2}
-          top={20 + height + offsets.top}
+          style={{
+            left: width / 2,
+            top: 20 + height + offsets.top,
+            filter: svgFilter,
+            cursor: dragCursor,
+          }}
           rotationDeg={rotationDeg}
-          svgFilter={svgFilter}
+          onDragMouseDown={onDragMouseDown}
         />
       )}
       {resizable && (
         <>
-          <ResizeHandler color={color} type="nw" onResizeMouseDown={onResizeMouseDown} left={0 - offsets.left} top={0 - offsets.top} />
-          <ResizeHandler color={color} type="n" onResizeMouseDown={onResizeMouseDown} left={width / 2} top={0 - offsets.top} />
-          <ResizeHandler color={color} type="ne" onResizeMouseDown={onResizeMouseDown} left={width + offsets.left} top={0 - offsets.top} />
-          <ResizeHandler color={color} type="w" onResizeMouseDown={onResizeMouseDown} left={0 - offsets.left} top={height / 2} />
-          <ResizeHandler color={color} type="e" onResizeMouseDown={onResizeMouseDown} left={width + offsets.left} top={height / 2} />
-          <ResizeHandler color={color} type="sw" onResizeMouseDown={onResizeMouseDown} left={0 - offsets.left} top={height + offsets.top} />
-          <ResizeHandler color={color} type="s" onResizeMouseDown={onResizeMouseDown} left={width / 2} top={height + offsets.top} />
-          <ResizeHandler color={color} type="se" onResizeMouseDown={onResizeMouseDown} left={width + offsets.left} top={height + offsets.top} />
+          <ResizeHandler
+            style={{ color, left: 0 - offsets.left, top: 0 - offsets.top, cursor: resizeHandlerCursor(rotationDeg - 45) }}
+            type="nw"
+            onResizeMouseDown={onResizeMouseDown}
+          />
+          <ResizeHandler
+            style={{ left: width / 2, top: 0 - offsets.top, color, cursor: resizeHandlerCursor(rotationDeg) }}
+            type="n"
+            onResizeMouseDown={onResizeMouseDown}
+          />
+          <ResizeHandler
+            style={{ left: width + offsets.left, top: 0 - offsets.top, color, cursor: resizeHandlerCursor(rotationDeg + 45) }}
+            type="ne"
+            onResizeMouseDown={onResizeMouseDown}
+          />
+          <ResizeHandler
+            style={{ left: 0 - offsets.left, top: height / 2, color, cursor: resizeHandlerCursor(rotationDeg - 90) }}
+            type="w"
+            onResizeMouseDown={onResizeMouseDown}
+          />
+          <ResizeHandler
+            style={{ left: width + offsets.left, top: height / 2, color, cursor: resizeHandlerCursor(rotationDeg + 90) }}
+            type="e"
+            onResizeMouseDown={onResizeMouseDown}
+          />
+          <ResizeHandler
+            style={{ left: 0 - offsets.left, top: height + offsets.top, color, cursor: resizeHandlerCursor(rotationDeg - 135) }}
+            type="sw"
+            onResizeMouseDown={onResizeMouseDown}
+          />
+          <ResizeHandler
+            style={{ left: width / 2, top: height + offsets.top, color, cursor: resizeHandlerCursor(rotationDeg + 180) }}
+            type="s"
+            onResizeMouseDown={onResizeMouseDown}
+          />
+          <ResizeHandler
+            style={{ left: width + offsets.left, top: height + offsets.top, color, cursor: resizeHandlerCursor(rotationDeg + 135) }}
+            type="se"
+            onResizeMouseDown={onResizeMouseDown}
+          />
         </>
       )}
       {rotatable && (
         <RotateHandler
-          onRotateMouseDown={onRotateMouseDown}
-          left={width / 2}
-          top={-20 - offsets.top}
+          style={{
+            left: width / 2,
+            top: -20 - offsets.top,
+            filter: svgFilter,
+          }}
           rotationDeg={rotationDeg}
-          svgFilter={svgFilter}
+          onRotateMouseDown={onRotateMouseDown}
         />
       )}
     </div>

@@ -12,7 +12,7 @@ import {
 } from '../types';
 import { topLeft2Center, vectorAngle } from '../utils';
 
-interface Props {
+interface UseRotateProps {
   styles: StylePos & StyleSize & StyleRot;
   resizableRef: RefObject<HTMLDivElement>;
   snapAngle: number | boolean;
@@ -21,7 +21,7 @@ interface Props {
   onRotateEnd?: OnRotateEndHandler;
 }
 
-const useRotate = (props: Props) => {
+const useRotate = (props: UseRotateProps) => {
   const { styles } = props;
   const isMouseDown = useRef(false);
   const isRotating = useRef(false);
@@ -92,6 +92,7 @@ const useRotate = (props: Props) => {
         if (isRotating) props.onRotateEnd?.({ style: { rotationDeg: newRotation.current }, totalDelta: totalDelta.current });
         isMouseDown.current = false;
         isRotating.current = false;
+        document.body.style.cursor = 'auto';
       };
 
       document.addEventListener('mouseup', onMouseUp);

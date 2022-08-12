@@ -1,40 +1,37 @@
-import React, { MouseEventHandler } from 'react';
+import React, { DetailedHTMLProps, MouseEventHandler } from 'react';
 import { OnDragMouseDown } from '../types';
 import MoveArrows from '../icons/MoveArrows.svg';
 import styles from './ResizableBox.module.css';
-import { CSSProperties } from 'react';
 import { captureClick, LEFT_MOUSE_BUTTON } from '../utils';
 
-interface Props {
-  left: number;
-  top: number;
+interface MoveHandlerProps extends DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   rotationDeg: number;
   onDragMouseDown: OnDragMouseDown;
-  svgFilter?: CSSProperties['filter'];
 }
 
-export const MoveHandler = (props: Props) => {
-  const { left, top, rotationDeg, onDragMouseDown, svgFilter } = props;
+export const MoveHandler = (props: MoveHandlerProps) => {
+  const { style, rotationDeg, onDragMouseDown } = props;
 
   const onMouseDownHandler: MouseEventHandler<HTMLDivElement> = (e) => {
     if (e.button !== LEFT_MOUSE_BUTTON) return;
     e.preventDefault();
     e.stopPropagation();
     captureClick();
+    document.body.style.cursor = 'grabbing';
     onDragMouseDown?.(e);
   };
 
   return (
     <div
-      onMouseDown={onMouseDownHandler}
       className={styles.moveHandler}
+      {...props}
       style={{
-        left,
-        top,
         transform: `translate(-50%, -50%) rotate(${-rotationDeg}deg)`,
+        ...style,
       }}
+      onMouseDown={onMouseDownHandler}
     >
-      <img style={{ filter: svgFilter }} src={MoveArrows} alt="Move" />
+      <img src={MoveArrows} alt="Move" />
     </div>
   );
 };
