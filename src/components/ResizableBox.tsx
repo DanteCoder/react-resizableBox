@@ -1,4 +1,4 @@
-import React, { CSSProperties, MouseEventHandler, useMemo } from 'react';
+import React, { CSSProperties, MouseEventHandler, useMemo, useRef } from 'react';
 import {
   OnDragHandler,
   OnDragEndHandler,
@@ -36,6 +36,7 @@ export interface ResizableBoxProps {
   resizable?: boolean;
   aspectRatio?: boolean | number;
   rotatable?: boolean;
+  snapAngle?: number | boolean;
   minWidth?: number;
   minHeight?: number;
   handlersSpaceOut?: number;
@@ -69,13 +70,16 @@ export const ResizableBox = (props: ResizableBoxProps) => {
     resizable = true,
     aspectRatio,
     rotatable = true,
+    snapAngle = 45,
     minWidth,
     minHeight,
     handlersSpaceOut = 50,
   } = props;
-
   const leftOffset = width < handlersSpaceOut ? (handlersSpaceOut - width) / 2 : 0;
   const topOffset = height < handlersSpaceOut ? (handlersSpaceOut - height) / 2 : 0;
+
+  const resizableRef = useRef<HTMLDivElement>(null);
+
   const [, isDragging, onDragMouseDown] = useDrag({
     styles: {
       left,
@@ -110,7 +114,8 @@ export const ResizableBox = (props: ResizableBoxProps) => {
       height,
       rotationDeg,
     },
-    topOffset: -20 - topOffset,
+    resizableRef,
+    snapAngle,
     onRotateStart: props.onRotateStart,
     onRotate: props.onRotate,
     onRotateEnd: props.onRotateEnd,
@@ -125,6 +130,7 @@ export const ResizableBox = (props: ResizableBoxProps) => {
 
   return (
     <div
+      ref={resizableRef}
       className={classnames(styles.mainContainer, props.className)}
       style={{
         left,

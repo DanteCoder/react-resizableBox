@@ -1,10 +1,21 @@
-import { MouseEventHandler, useCallback, useRef } from 'react';
-import { DeltaRot, OnRotateEndHandler, OnRotateHandler, OnRotateMouseDown, OnRotateStartHandler, StylePos, StyleRot, StyleSize } from '../types';
-import { deg2Rad, vectorAngle } from '../utils';
+import { MouseEventHandler, RefObject, useCallback, useMemo, useRef } from 'react';
+import {
+  DeltaPos,
+  DeltaRot,
+  OnRotateEndHandler,
+  OnRotateHandler,
+  OnRotateMouseDown,
+  OnRotateStartHandler,
+  StylePos,
+  StyleRot,
+  StyleSize,
+} from '../types';
+import { topLeft2Center, vectorAngle } from '../utils';
 
 interface Props {
   styles: StylePos & StyleSize & StyleRot;
-  topOffset: number;
+  resizableRef: RefObject<HTMLDivElement>;
+  snapAngle: number | boolean;
   onRotateStart?: OnRotateStartHandler;
   onRotate?: OnRotateHandler;
   onRotateEnd?: OnRotateEndHandler;
@@ -14,11 +25,18 @@ const useRotate = (props: Props) => {
   const { styles } = props;
   const isMouseDown = useRef(false);
   const isRotating = useRef(false);
+  const resizableCenter = useRef({ x: 0, y: 0 });
   const startMousePos = useRef({ x: 0, y: 0 });
   const startStyles = useRef(styles);
   const newRotation = useRef(styles.rotationDeg);
   const prevRotation = useRef(styles.rotationDeg);
   const totalDelta = useRef<DeltaRot>({ deg: 0 });
+
+  const snapAngle = useMemo((): number | undefined => {
+    if (typeof props.snapAngle === 'boolean') return undefined;
+    if (props.snapAngle === 0) return undefined;
+    return props.snapAngle;
+  }, []);
 
   const onMouseDown: MouseEventHandler<HTMLDivElement> = useCallback(
     (e) => {
@@ -27,6 +45,10 @@ const useRotate = (props: Props) => {
       startStyles.current = styles;
       prevRotation.current = styles.rotationDeg;
       totalDelta.current = { deg: 0 };
+
+      const clientRect = props.resizableRef.current?.getBoundingClientRect();
+      if (!clientRect) return;
+      resizableCenter.current = topLeft2Center(clientRect.y, clientRect.x, clientRect.width, clientRect.height);
 
       const onMouseMove = (e: MouseEvent) => {
         if (!isMouseDown.current) return;
@@ -38,11 +60,17 @@ const useRotate = (props: Props) => {
         isRotating.current = true;
 
         const mouseDelta = {
-          deltaX: clientX - startMousePos.current.x,
-          deltaY: clientY - startMousePos.current.y,
+          x: clientX - startMousePos.current.x,
+          y: clientY - startMousePos.current.y,
         };
 
-        newRotation.current = getNewRotation(mouseDelta, startStyles.current, props.topOffset, e.shiftKey);
+        newRotation.current = getNewRotation(
+          startMousePos.current,
+          resizableCenter.current,
+          mouseDelta,
+          startStyles.current,
+          e.shiftKey ? snapAngle : undefined
+        );
 
         const delta = {
           deg: newRotation.current - prevRotation.current,
@@ -75,23 +103,24 @@ const useRotate = (props: Props) => {
   return [isMouseDown.current, onMouseDown] as [boolean, OnRotateMouseDown];
 };
 
-const getNewRotation = (
-  delta: { deltaX: number; deltaY: number },
-  styles: { top: number; left: number; width: number; height: number; rotationDeg: number },
-  offsetTop: number,
-  isShiftKey: boolean
-) => {
-  const rotationRad = deg2Rad(styles.rotationDeg);
-  const startX = (styles.height / 2 - offsetTop) * Math.sin(rotationRad);
-  const startY = -(styles.height / 2 - offsetTop) * Math.cos(rotationRad);
-  const endX = startX + delta.deltaX;
-  const endY = startY + delta.deltaY;
+const getNewRotation = (startMousePos: DeltaPos, rotationCenter: DeltaPos, mouseDelta: DeltaPos, startStyles: StyleRot, snapAngle?: number) => {
+  const startVector = {
+    x: startMousePos.x - rotationCenter.x,
+    y: startMousePos.y - rotationCenter.y,
+  };
+  const endVector = {
+    x: startVector.x + mouseDelta.x,
+    y: startVector.y + mouseDelta.y,
+  };
 
-  const deltaAngle = ((vectorAngle(endX, endY) - vectorAngle(startX, startY)) * 180) / Math.PI;
-  let newAngle = Math.round(deltaAngle + styles.rotationDeg);
+  const startVectorAngle = vectorAngle(startVector.x, startVector.y);
+  const endVectorAngle = vectorAngle(endVector.x, endVector.y);
+  const deltaAngle = ((endVectorAngle - startVectorAngle) * 180) / Math.PI;
 
-  if (isShiftKey) {
-    newAngle = Math.round(newAngle / 45) * 45;
+  let newAngle = Math.round(startStyles.rotationDeg + deltaAngle);
+
+  if (snapAngle != null) {
+    newAngle = Math.round(newAngle / snapAngle) * snapAngle;
   }
 
   return newAngle;
