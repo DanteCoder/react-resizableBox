@@ -1,7 +1,7 @@
 {
   "author": "Dante Barboza",
   "name": "@dantecoder/react-resizablebox",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "A React resizable, draggable, rotatable box",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -9,6 +9,7 @@
     "dist"
   ],
   "scripts": {
+    "prepublish": "npm run build",
     "build": "rm -rf dist/ && prettier --write src/ && npm run build:esm && npm run build:cjs && npm run copy-assets",
     "build:esm": "tsc",
     "build:cjs": "tsc --module CommonJS --outDir dist/cjs",
