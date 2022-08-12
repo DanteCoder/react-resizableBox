@@ -12,7 +12,7 @@ import {
   StyleRot,
   StyleSize,
 } from '../types';
-import { center2TopLeft, deg2Rad, deltaLength, topLeft2Center, vectorAngle } from '../utils';
+import { center2TopLeft, deg2Rad, vectorLength, topLeft2Center, vectorAngle } from '../utils';
 
 interface Props {
   styles: StylePos & StyleSize & StyleRot;
@@ -87,7 +87,7 @@ const useResize = (props: Props) => {
         props.onResize?.({ style: newStyle, delta: stylesDelta, totalDelta: stylesTotalDelta.current });
       };
 
-      const onMouseUp = (_e: MouseEvent) => {
+      const onMouseUp = () => {
         if (!isMouseDown.current) return;
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
@@ -102,7 +102,7 @@ const useResize = (props: Props) => {
     [aspectRatio, minHeight, minWidth, props, scale, styles]
   );
 
-  return [isMouseDown.current, onMouseDown] as [boolean, OnResizeMouseDown];
+  return onMouseDown;
 };
 
 const getNewStyle = (
@@ -114,7 +114,7 @@ const getNewStyle = (
   aspectRatio: number | boolean,
   symetrical: boolean
 ): StylePos & StyleSize => {
-  const deltaL = deltaLength(mouseDelta.x, mouseDelta.y);
+  const deltaL = vectorLength(mouseDelta.x, mouseDelta.y);
   const alpha = vectorAngle(mouseDelta.x, mouseDelta.y);
   const rotationRad = deg2Rad(initStyle.rotationDeg);
   const relativeAngle = alpha - rotationRad;

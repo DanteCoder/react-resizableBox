@@ -1,50 +1,32 @@
-import React, { MouseEventHandler, useEffect } from 'react';
+import React, { MouseEventHandler } from 'react';
 import { OnDragMouseDown } from '../types';
 import MoveArrows from '../icons/MoveArrows.svg';
 import styles from './ResizableBox.module.css';
 import { CSSProperties } from 'react';
+import { captureClick, LEFT_MOUSE_BUTTON } from '../utils';
 
 interface Props {
   left: number;
   top: number;
   rotationDeg: number;
-  draggable: boolean;
-  isDragging: boolean;
-  onMouseDown: OnDragMouseDown;
+  onDragMouseDown: OnDragMouseDown;
   svgFilter?: CSSProperties['filter'];
 }
 
 export const MoveHandler = (props: Props) => {
-  const { left, top, rotationDeg, draggable, isDragging, onMouseDown, svgFilter } = props;
-
-  useEffect(() => {
-    if (!isDragging) return;
-    const captureClick = (e: MouseEvent) => {
-      e.stopPropagation();
-      requestAnimationFrame(() => {
-        document.removeEventListener('click', captureClick, true);
-      });
-    };
-    document.addEventListener('click', captureClick, true);
-  }, [isDragging]);
+  const { left, top, rotationDeg, onDragMouseDown, svgFilter } = props;
 
   const onMouseDownHandler: MouseEventHandler<HTMLDivElement> = (e) => {
+    if (e.button !== LEFT_MOUSE_BUTTON) return;
     e.preventDefault();
     e.stopPropagation();
-
-    const captureClick = (e: MouseEvent) => {
-      e.stopPropagation();
-      requestAnimationFrame(() => {
-        document.removeEventListener('click', captureClick, true);
-      });
-    };
-
-    document.addEventListener('click', captureClick, true);
-    onMouseDown?.(e);
+    captureClick();
+    onDragMouseDown?.(e);
   };
+
   return (
     <div
-      onMouseDown={draggable ? onMouseDownHandler : undefined}
+      onMouseDown={onMouseDownHandler}
       className={styles.moveHandler}
       style={{
         left,

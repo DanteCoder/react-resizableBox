@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { MouseEventHandler, useRef } from 'react';
 import { DeltaPos, OnDragHandler, OnDragEndHandler, OnDragStartHandler, StylePos } from '../types';
 
@@ -14,7 +14,6 @@ const useDrag = (props: Props) => {
   const { styles, scale } = props;
   const isMouseDown = useRef(false);
   const isDragging = useRef(false);
-  const [isDraggingState, setIsDraggingState] = useState(false);
   const startMousePos = useRef({ x: 0, y: 0 });
   const prevMousePos = useRef({ x: 0, y: 0 });
   const startStyles = useRef(styles);
@@ -40,7 +39,6 @@ const useDrag = (props: Props) => {
 
         if (!isDragging.current) props.onDragStart?.();
         isDragging.current = true;
-        setIsDraggingState(true);
 
         const mouseDelta = {
           x: (clientX - prevMousePos.current.x) / scale,
@@ -65,14 +63,13 @@ const useDrag = (props: Props) => {
         props.onDrag?.({ style: newStyle.current, delta: mouseDelta, totalDelta: totalPosDelta.current });
       };
 
-      const onMouseUp = (_e: MouseEvent) => {
+      const onMouseUp = () => {
         if (!isMouseDown.current) return;
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
         if (isDragging.current) props.onDragEnd?.({ style: newStyle.current, totalDelta: totalPosDelta.current });
         isMouseDown.current = false;
         isDragging.current = false;
-        setIsDraggingState(false);
       };
 
       document.addEventListener('mouseup', onMouseUp);
@@ -81,7 +78,7 @@ const useDrag = (props: Props) => {
     [props, scale]
   );
 
-  return [isMouseDown.current, isDraggingState, onMouseDown] as [boolean, boolean, MouseEventHandler<HTMLDivElement>];
+  return onMouseDown;
 };
 
 export default useDrag;

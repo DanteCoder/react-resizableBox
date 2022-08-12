@@ -1,5 +1,6 @@
 import React, { CSSProperties, MouseEventHandler } from 'react';
 import { ResizeHandlerType, OnResizeMouseDown } from '../types';
+import { captureClick, LEFT_MOUSE_BUTTON } from '../utils';
 import styles from './ResizableBox.module.css';
 
 interface Props {
@@ -7,25 +8,19 @@ interface Props {
   top: number;
   type: ResizeHandlerType;
   color?: CSSProperties['color'];
-  onMouseDown?: OnResizeMouseDown;
+  onResizeMouseDown?: OnResizeMouseDown;
 }
 
 export const ResizeHandler = (props: Props) => {
-  const { left, top, type, onMouseDown, color } = props;
+  const { left, top, type, onResizeMouseDown, color } = props;
 
   const onMouseDownHandler: MouseEventHandler<HTMLDivElement> = (e) => {
+    if (e.button !== LEFT_MOUSE_BUTTON) return;
+    e.preventDefault();
     e.stopPropagation();
-
-    const captureClick = (e: MouseEvent) => {
-      e.stopPropagation();
-      requestAnimationFrame(() => {
-        document.removeEventListener('click', captureClick, true);
-      });
-    };
-
-    document.addEventListener('click', captureClick, true);
-    onMouseDown?.(e, type);
+    captureClick();
+    onResizeMouseDown?.(e, type);
   };
 
-  return <div onMouseDown={onMouseDownHandler} className={styles.resizeHandler} style={{ left, top, color }}></div>;
+  return <div onMouseDown={onMouseDownHandler} className={styles.resizeHandler} style={{ left, top, color }} />;
 };

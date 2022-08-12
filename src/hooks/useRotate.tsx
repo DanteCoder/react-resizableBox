@@ -1,4 +1,4 @@
-import { MouseEventHandler, RefObject, useCallback, useMemo, useRef } from 'react';
+import { RefObject, useCallback, useMemo, useRef } from 'react';
 import {
   DeltaPos,
   DeltaRot,
@@ -38,7 +38,7 @@ const useRotate = (props: Props) => {
     return props.snapAngle;
   }, []);
 
-  const onMouseDown: MouseEventHandler<HTMLDivElement> = useCallback(
+  const onMouseDown: OnRotateMouseDown = useCallback(
     (e) => {
       isMouseDown.current = true;
       startMousePos.current = { x: e.clientX, y: e.clientY };
@@ -85,7 +85,7 @@ const useRotate = (props: Props) => {
         props.onRotate?.({ style: { rotationDeg: newRotation.current }, delta, totalDelta: totalDelta.current });
       };
 
-      const onMouseUp = (_e: MouseEvent) => {
+      const onMouseUp = () => {
         if (!isMouseDown.current) return;
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
@@ -100,7 +100,7 @@ const useRotate = (props: Props) => {
     [props, styles]
   );
 
-  return [isMouseDown.current, onMouseDown] as [boolean, OnRotateMouseDown];
+  return onMouseDown;
 };
 
 const getNewRotation = (startMousePos: DeltaPos, rotationCenter: DeltaPos, mouseDelta: DeltaPos, startStyles: StyleRot, snapAngle?: number) => {
