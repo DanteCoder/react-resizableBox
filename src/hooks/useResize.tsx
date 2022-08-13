@@ -17,8 +17,8 @@ import { center2TopLeft, deg2Rad, vectorLength, topLeft2Center, vectorAngle } fr
 interface UseResizeProps {
   styles: StylePos & StyleSize & StyleRot;
   scale: number;
-  minWidth?: number;
-  minHeight?: number;
+  minWidth: number;
+  minHeight: number;
   aspectRatio: number | boolean;
   onResizeStart?: OnResizeStartHandler;
   onResize?: OnResizeHandler;
@@ -26,7 +26,7 @@ interface UseResizeProps {
 }
 
 const useResize = (props: UseResizeProps): [OnResizeMouseDown, boolean] => {
-  const { styles, scale, minWidth = 10, minHeight = 10 } = props;
+  const { styles, scale, minWidth, minHeight } = props;
   const isMouseDown = useRef(false);
   const isResizing = useRef(false);
   const handlerType = useRef<ResizeHandlerType>('n');
