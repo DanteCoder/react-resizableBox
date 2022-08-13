@@ -3,6 +3,8 @@
 }
 
 .rectangle {
+  width: 100%;
+  height: 100%;
   box-shadow: inset 0 0 0 1px;
   color: rgba(30, 70, 255, 1);
 }
@@ -22,7 +24,8 @@
   position: absolute;
   width: 30px;
   height: 30px;
-  transform: translate(-50%, -50%);
+  transition: ease 0.3s;
+  transition-property: left, top;
 }
 
 .rotateHandler img {
@@ -35,7 +38,8 @@
   position: absolute;
   width: 30px;
   height: 30px;
-  transform: translate(-50%, -50%);
+  transition: ease 0.3s;
+  transition-property: left, top;
 }
 
 .moveHandler img {

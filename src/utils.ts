@@ -31,6 +31,34 @@ export const getResizeCursors = (rotationDeg: number) => {
   };
 };
 
+const sign = (num: number) => (num >= 0 ? 1 : -1);
+
+export const getParametricPos = (width: number, height: number, rotationDeg: number, offsetWidth: number, offsetHeight: number) => {
+  const angle = deg2Rad(rotationDeg);
+  const sin = Math.sin(angle);
+  const cos = Math.cos(angle);
+  const tan = Math.tan(angle);
+
+  const parametricWidth = width + 2 * offsetWidth;
+  const parametricHeight = height + 2 * offsetHeight;
+
+  let x = 0;
+  let y = 0;
+
+  x = (parametricHeight / 2) * tan * sign(cos);
+  y = (parametricHeight / 2) * sign(-cos);
+
+  if (Math.abs(x) > parametricWidth / 2) {
+    x = (parametricWidth / 2) * sign(x);
+    y = (parametricWidth / 2) * (1 / tan) * sign(-sin);
+  }
+
+  return {
+    left: x + width / 2,
+    top: y + height / 2,
+  };
+};
+
 /**
  * Stops the next click event propagation
  */

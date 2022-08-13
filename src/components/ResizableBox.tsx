@@ -18,7 +18,7 @@ import { Rectangle } from './Rectangle';
 import { MoveHandler } from './MoveHandler';
 import { ResizeHandler } from './ResizeHandler';
 import { RotateHandler } from './RotateHandler';
-import { getResizeCursors } from '../utils';
+import { getParametricPos, getResizeCursors } from '../utils';
 import styles from './ResizableBox.module.css';
 
 export interface ResizableBoxProps extends Omit<DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>, 'onDrag' | 'onDragEnd'> {
@@ -32,13 +32,17 @@ export interface ResizableBoxProps extends Omit<DetailedHTMLProps<React.HTMLAttr
   svgFilter?: CSSProperties['filter'];
   draggable?: boolean;
   dragHandler?: boolean;
+  dragHandlerDeg?: number;
   resizable?: boolean;
   aspectRatio?: boolean | number;
   rotatable?: boolean;
   snapAngle?: number | boolean;
+  rotateHandlerDeg?: number;
   minWidth?: number;
   minHeight?: number;
+  handlersOffset?: number;
   handlersSpaceOut?: number;
+  relativeHandlers?: boolean;
   onDragStart?: OnDragStartHandler;
   onDrag?: OnDragHandler;
   onDragEnd?: OnDragEndHandler;
@@ -62,9 +66,13 @@ export const ResizableBox = (props: ResizableBoxProps) => {
     svgFilter,
     draggable = true,
     dragHandler = false,
+    dragHandlerDeg = 180,
+    relativeHandlers = true,
     resizable = true,
     aspectRatio = false,
     rotatable = true,
+    rotateHandlerDeg = 0,
+    handlersOffset = 20,
     snapAngle = 45,
     minWidth,
     minHeight,
@@ -108,10 +116,39 @@ export const ResizableBox = (props: ResizableBoxProps) => {
     onRotateEnd,
   });
 
-  const offsets = {
-    left: width < handlersSpaceOut ? (handlersSpaceOut - width) / 2 : 0,
-    top: height < handlersSpaceOut ? (handlersSpaceOut - height) / 2 : 0,
-  };
+  const offsets = useMemo(
+    () => ({
+      left: width < handlersSpaceOut ? (handlersSpaceOut - width) / 2 : 0,
+      top: height < handlersSpaceOut ? (handlersSpaceOut - height) / 2 : 0,
+    }),
+    [width, height, handlersSpaceOut]
+  );
+
+  const rotateHandlerPos = useMemo(() => {
+    return {
+      ...getParametricPos(
+        width,
+        height,
+        rotateHandlerDeg - (relativeHandlers ? 0 : rotationDeg),
+        handlersOffset + offsets.left,
+        handlersOffset + offsets.top
+      ),
+      transition: isResizing ? 'unset' : undefined,
+    };
+  }, [isRotating, isResizing, width, height, rotateHandlerDeg, relativeHandlers, handlersOffset, offsets]);
+
+  const dragHandlerPos = useMemo(() => {
+    return {
+      ...getParametricPos(
+        width,
+        height,
+        dragHandlerDeg - (relativeHandlers ? 0 : rotationDeg),
+        handlersOffset + offsets.left,
+        handlersOffset + offsets.top
+      ),
+      transition: isResizing ? 'unset' : undefined,
+    };
+  }, [isRotating, isResizing, width, height, dragHandlerDeg, relativeHandlers, handlersOffset, offsets]);
 
   const dragCursor = useMemo((): CSSProperties['cursor'] => {
     if (!draggable || isResizing || isRotating) return;
@@ -138,17 +175,18 @@ export const ResizableBox = (props: ResizableBoxProps) => {
       style={{
         left,
         top,
+        width,
+        height,
         overflow: 'visible',
         transform: `rotate(${rotationDeg}deg)`,
         ...htmlProps.style,
       }}
     >
-      <Rectangle onDragMouseDown={onDragMouseDown} draggable={draggable} style={{ width, height, color, cursor: dragCursor }} />
+      <Rectangle onDragMouseDown={onDragMouseDown} draggable={draggable} style={{ color, cursor: dragCursor }} />
       {draggable && dragHandler && (
         <MoveHandler
           style={{
-            left: width / 2,
-            top: 20 + height + offsets.top,
+            ...dragHandlerPos,
             filter: svgFilter,
             cursor: dragCursor,
           }}
@@ -203,8 +241,7 @@ export const ResizableBox = (props: ResizableBoxProps) => {
       {rotatable && (
         <RotateHandler
           style={{
-            left: width / 2,
-            top: -20 - offsets.top,
+            ...rotateHandlerPos,
             filter: svgFilter,
             cursor: rotateCursor,
           }}
