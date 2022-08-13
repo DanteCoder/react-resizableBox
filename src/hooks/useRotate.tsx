@@ -1,4 +1,4 @@
-import { RefObject, useCallback, useMemo, useRef } from 'react';
+import { RefObject, useCallback, useMemo, useRef, useState } from 'react';
 import {
   DeltaPos,
   DeltaRot,
@@ -21,7 +21,7 @@ interface UseRotateProps {
   onRotateEnd?: OnRotateEndHandler;
 }
 
-const useRotate = (props: UseRotateProps) => {
+const useRotate = (props: UseRotateProps): [OnRotateMouseDown, boolean] => {
   const { styles } = props;
   const isMouseDown = useRef(false);
   const isRotating = useRef(false);
@@ -31,6 +31,8 @@ const useRotate = (props: UseRotateProps) => {
   const newRotation = useRef(styles.rotationDeg);
   const prevRotation = useRef(styles.rotationDeg);
   const totalDelta = useRef<DeltaRot>({ deg: 0 });
+
+  const [_isRotating, setIsRotating] = useState(false);
 
   const snapAngle = useMemo((): number | undefined => {
     if (typeof props.snapAngle === 'boolean') return undefined;
@@ -58,6 +60,7 @@ const useRotate = (props: UseRotateProps) => {
 
         if (!isRotating.current) props.onRotateStart?.();
         isRotating.current = true;
+        setIsRotating(true);
 
         const mouseDelta = {
           x: clientX - startMousePos.current.x,
@@ -92,6 +95,7 @@ const useRotate = (props: UseRotateProps) => {
         if (isRotating) props.onRotateEnd?.({ style: { rotationDeg: newRotation.current }, totalDelta: totalDelta.current });
         isMouseDown.current = false;
         isRotating.current = false;
+        setIsRotating(false);
         document.body.style.cursor = 'auto';
       };
 
@@ -101,7 +105,7 @@ const useRotate = (props: UseRotateProps) => {
     [props, styles]
   );
 
-  return onMouseDown;
+  return [onMouseDown, _isRotating];
 };
 
 const getNewRotation = (startMousePos: DeltaPos, rotationCenter: DeltaPos, mouseDelta: DeltaPos, startStyles: StyleRot, snapAngle?: number) => {

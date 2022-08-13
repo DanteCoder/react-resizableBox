@@ -1,4 +1,4 @@
-import React, { CSSProperties, DetailedHTMLProps, useRef } from 'react';
+import React, { CSSProperties, DetailedHTMLProps, useMemo, useRef } from 'react';
 import {
   OnDragHandler,
   OnDragEndHandler,
@@ -18,8 +18,8 @@ import { Rectangle } from './Rectangle';
 import { MoveHandler } from './MoveHandler';
 import { ResizeHandler } from './ResizeHandler';
 import { RotateHandler } from './RotateHandler';
+import { getResizeCursors } from '../utils';
 import styles from './ResizableBox.module.css';
-import { resizeHandlerCursor } from '../utils';
 
 export interface ResizableBoxProps extends Omit<DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>, 'onDrag' | 'onDragEnd'> {
   width: number;
@@ -89,7 +89,7 @@ export const ResizableBox = (props: ResizableBoxProps) => {
     onDrag,
     onDragEnd,
   });
-  const onResizeMouseDown = useResize({
+  const [onResizeMouseDown, isResizing] = useResize({
     styles: { left, top, width, height, rotationDeg },
     scale,
     minHeight,
@@ -99,7 +99,7 @@ export const ResizableBox = (props: ResizableBoxProps) => {
     onResize,
     onResizeEnd,
   });
-  const onRotateMouseDown = useRotate({
+  const [onRotateMouseDown, isRotating] = useRotate({
     styles: { top, left, width, height, rotationDeg },
     resizableRef,
     snapAngle,
@@ -113,11 +113,22 @@ export const ResizableBox = (props: ResizableBoxProps) => {
     top: height < handlersSpaceOut ? (handlersSpaceOut - height) / 2 : 0,
   };
 
-  const dragCursor = ((): CSSProperties['cursor'] => {
-    if (!draggable) return 'auto';
+  const dragCursor = useMemo((): CSSProperties['cursor'] => {
+    if (!draggable || isResizing || isRotating) return;
     if (!isDragging) return 'grab';
     return 'grabbing';
-  })();
+  }, [draggable, isResizing, isRotating, isDragging]);
+
+  const resizeCursors: any = useMemo(() => {
+    if (!resizable || isDragging || isRotating) return {};
+    return getResizeCursors(rotationDeg);
+  }, [resizable, isDragging, isRotating, rotationDeg]);
+
+  const rotateCursor = useMemo((): CSSProperties['cursor'] => {
+    if (!rotatable || isDragging || isResizing) return;
+    if (!isRotating) return 'pointer';
+    return 'grabbing';
+  }, [rotatable, isDragging, isResizing, isRotating]);
 
   return (
     <div
@@ -128,7 +139,7 @@ export const ResizableBox = (props: ResizableBoxProps) => {
         left,
         top,
         overflow: 'visible',
-        transform: rotationDeg ? `rotate(${rotationDeg}deg)` : undefined,
+        transform: `rotate(${rotationDeg}deg)`,
         ...htmlProps.style,
       }}
     >
@@ -148,42 +159,42 @@ export const ResizableBox = (props: ResizableBoxProps) => {
       {resizable && (
         <>
           <ResizeHandler
-            style={{ color, left: 0 - offsets.left, top: 0 - offsets.top, cursor: resizeHandlerCursor(rotationDeg - 45) }}
+            style={{ color, left: 0 - offsets.left, top: 0 - offsets.top, cursor: resizeCursors['nw'] }}
             type="nw"
             onResizeMouseDown={onResizeMouseDown}
           />
           <ResizeHandler
-            style={{ left: width / 2, top: 0 - offsets.top, color, cursor: resizeHandlerCursor(rotationDeg) }}
+            style={{ left: width / 2, top: 0 - offsets.top, color, cursor: resizeCursors['n'] }}
             type="n"
             onResizeMouseDown={onResizeMouseDown}
           />
           <ResizeHandler
-            style={{ left: width + offsets.left, top: 0 - offsets.top, color, cursor: resizeHandlerCursor(rotationDeg + 45) }}
+            style={{ left: width + offsets.left, top: 0 - offsets.top, color, cursor: resizeCursors['ne'] }}
             type="ne"
             onResizeMouseDown={onResizeMouseDown}
           />
           <ResizeHandler
-            style={{ left: 0 - offsets.left, top: height / 2, color, cursor: resizeHandlerCursor(rotationDeg - 90) }}
+            style={{ left: 0 - offsets.left, top: height / 2, color, cursor: resizeCursors['w'] }}
             type="w"
             onResizeMouseDown={onResizeMouseDown}
           />
           <ResizeHandler
-            style={{ left: width + offsets.left, top: height / 2, color, cursor: resizeHandlerCursor(rotationDeg + 90) }}
+            style={{ left: width + offsets.left, top: height / 2, color, cursor: resizeCursors['e'] }}
             type="e"
             onResizeMouseDown={onResizeMouseDown}
           />
           <ResizeHandler
-            style={{ left: 0 - offsets.left, top: height + offsets.top, color, cursor: resizeHandlerCursor(rotationDeg - 135) }}
+            style={{ left: 0 - offsets.left, top: height + offsets.top, color, cursor: resizeCursors['sw'] }}
             type="sw"
             onResizeMouseDown={onResizeMouseDown}
           />
           <ResizeHandler
-            style={{ left: width / 2, top: height + offsets.top, color, cursor: resizeHandlerCursor(rotationDeg + 180) }}
+            style={{ left: width / 2, top: height + offsets.top, color, cursor: resizeCursors['s'] }}
             type="s"
             onResizeMouseDown={onResizeMouseDown}
           />
           <ResizeHandler
-            style={{ left: width + offsets.left, top: height + offsets.top, color, cursor: resizeHandlerCursor(rotationDeg + 135) }}
+            style={{ left: width + offsets.left, top: height + offsets.top, color, cursor: resizeCursors['se'] }}
             type="se"
             onResizeMouseDown={onResizeMouseDown}
           />
@@ -195,6 +206,7 @@ export const ResizableBox = (props: ResizableBoxProps) => {
             left: width / 2,
             top: -20 - offsets.top,
             filter: svgFilter,
+            cursor: rotateCursor,
           }}
           rotationDeg={rotationDeg}
           onRotateMouseDown={onRotateMouseDown}

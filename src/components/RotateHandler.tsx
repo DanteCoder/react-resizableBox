@@ -17,7 +17,7 @@ export const RotateHandler = (props: RotateHandlerProps) => {
     e.preventDefault();
     e.stopPropagation();
     captureClick();
-    document.body.style.cursor = 'pointer';
+    document.body.style.cursor = 'grabbing';
     onRotateMouseDown?.(e);
   };
 

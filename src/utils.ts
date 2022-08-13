@@ -14,23 +14,21 @@ export const center2TopLeft = (centerX: number, centerY: number, width: number, 
   top: centerY - height / 2,
 });
 
-const resizeCursors: { [key: number]: CSSProperties['cursor'] } = {
-  0: 'n-resize',
-  45: 'ne-resize',
-  90: 'e-resize',
-  135: 'se-resize',
-  180: 's-resize',
-  225: 'sw-resize',
-  270: 'w-resize',
-  315: 'nw-resize',
-  360: 'n-resize',
-};
+const resizeCursors: CSSProperties['cursor'][] = ['n-resize', 'ne-resize', 'e-resize', 'se-resize', 's-resize', 'sw-resize', 'w-resize', 'nw-resize'];
 
-export const resizeHandlerCursor = (rotationDeg: number) => {
-  const modulus = rotationDeg % 360;
-  const angle = modulus < 0 ? modulus + 360 : modulus;
-  const rounded = Math.round(angle / 45) * 45;
-  return resizeCursors[rounded];
+export const getResizeCursors = (rotationDeg: number) => {
+  const topPosition = Math.round(rotationDeg / 45);
+  const absTopPosition = topPosition < 0 ? topPosition + 8 : topPosition;
+  return {
+    n: resizeCursors[absTopPosition % 8],
+    ne: resizeCursors[(absTopPosition + 1) % 8],
+    e: resizeCursors[(absTopPosition + 2) % 8],
+    se: resizeCursors[(absTopPosition + 3) % 8],
+    s: resizeCursors[(absTopPosition + 4) % 8],
+    sw: resizeCursors[(absTopPosition + 5) % 8],
+    w: resizeCursors[(absTopPosition + 6) % 8],
+    nw: resizeCursors[(absTopPosition + 7) % 8],
+  };
 };
 
 /**

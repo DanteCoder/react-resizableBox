@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import { ResizableBox, ResizableBoxProps } from '../components/ResizableBox';
+import { ResizableBox } from '../components/ResizableBox';
 import { OnDragHandler, OnResizeHandler, OnRotateHandler } from '../types';
 
 export default {

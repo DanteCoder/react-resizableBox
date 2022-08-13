@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useRef } from 'react';
 import {
   DeltaPos,
@@ -25,7 +25,7 @@ interface UseResizeProps {
   onResizeEnd?: OnResizeEndHandler;
 }
 
-const useResize = (props: UseResizeProps) => {
+const useResize = (props: UseResizeProps): [OnResizeMouseDown, boolean] => {
   const { styles, scale, minWidth = 10, minHeight = 10 } = props;
   const isMouseDown = useRef(false);
   const isResizing = useRef(false);
@@ -34,6 +34,8 @@ const useResize = (props: UseResizeProps) => {
   const startStyle = useRef(styles);
   const prevStyle = useRef<StylePos & StyleSize>(styles);
   const stylesTotalDelta = useRef<DeltaPos & DeltaSize>({ x: 0, y: 0, w: 0, h: 0 });
+
+  const [_isResizing, setIsResizing] = useState(false);
 
   const aspectRatio = useMemo(() => {
     if (typeof props.aspectRatio === 'boolean') return props.aspectRatio;
@@ -60,6 +62,7 @@ const useResize = (props: UseResizeProps) => {
 
         if (!isResizing.current) props.onResizeStart?.();
         isResizing.current = true;
+        setIsResizing(true);
 
         const mouseDelta = {
           x: (clientX - startMousePos.current.x) / scale,
@@ -94,6 +97,7 @@ const useResize = (props: UseResizeProps) => {
         if (isResizing.current) props.onResizeEnd?.({ style: prevStyle.current, totalDelta: stylesTotalDelta.current });
         isMouseDown.current = false;
         isResizing.current = false;
+        setIsResizing(false);
         document.body.style.cursor = 'auto';
       };
 
@@ -103,7 +107,7 @@ const useResize = (props: UseResizeProps) => {
     [aspectRatio, minHeight, minWidth, props, scale, styles]
   );
 
-  return onMouseDown;
+  return [onMouseDown, _isResizing];
 };
 
 const getNewStyle = (
