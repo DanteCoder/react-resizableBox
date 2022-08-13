@@ -1,6 +1,6 @@
 # React Resizable Box
 
-![npm](https://img.shields.io/npm/v/@dantecoder/react-resizablebox) ![NPM](https://img.shields.io/npm/l/@dantecoder/react-resizablebox)
+[![npm](https://img.shields.io/npm/v/@dantecoder/react-resizablebox.svg)](https://www.npmjs.com/package/@dantecoder/react-resizablebox) [![NPM](https://img.shields.io/npm/l/@dantecoder/react-resizablebox.svg)](https://github.com/DanteCoder/react-resizableBox/blob/main/LICENSE)
 
 A resizable, draggable, rotatable React widget.
 
