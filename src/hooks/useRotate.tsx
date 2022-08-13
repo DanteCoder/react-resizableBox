@@ -10,7 +10,7 @@ import {
   StyleRot,
   StyleSize,
 } from '../types';
-import { topLeft2Center, vectorAngle } from '../utils';
+import { captureClick, topLeft2Center, vectorAngle } from '../utils';
 
 interface UseRotateProps {
   styles: StylePos & StyleSize & StyleRot;
@@ -58,7 +58,10 @@ const useRotate = (props: UseRotateProps): [OnRotateMouseDown, boolean] => {
         e.stopImmediatePropagation();
         const { clientX, clientY } = e;
 
-        if (!isRotating.current) props.onRotateStart?.();
+        if (!isRotating.current) {
+          captureClick();
+          props.onRotateStart?.();
+        }
         isRotating.current = true;
         setIsRotating(true);
 

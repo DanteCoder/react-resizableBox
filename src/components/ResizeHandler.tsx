@@ -1,6 +1,6 @@
 import React, { DetailedHTMLProps, MouseEventHandler } from 'react';
 import { ResizeHandlerType, OnResizeMouseDown } from '../types';
-import { captureClick, LEFT_MOUSE_BUTTON } from '../utils';
+import { LEFT_MOUSE_BUTTON } from '../utils';
 import styles from './ResizableBox.module.css';
 
 interface ResizeHandlerProps extends DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -15,7 +15,6 @@ export const ResizeHandler = (props: ResizeHandlerProps) => {
     if (e.button !== LEFT_MOUSE_BUTTON) return;
     e.preventDefault();
     e.stopPropagation();
-    captureClick();
     document.body.style.cursor = style?.cursor ?? 'auto';
     onResizeMouseDown?.(e, type);
   };

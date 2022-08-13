@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useRef } from 'react';
 import { DeltaPos, OnDragHandler, OnDragEndHandler, OnDragStartHandler, StylePos, OnDragMouseDown } from '../types';
+import { captureClick } from '../utils';
 
 interface UseDragProps {
   styles: StylePos;
@@ -39,7 +40,10 @@ const useDrag = (props: UseDragProps): [OnDragMouseDown, boolean] => {
         e.stopImmediatePropagation();
         const { clientX, clientY } = e;
 
-        if (!isDragging.current) props.onDragStart?.();
+        if (!isDragging.current) {
+          captureClick();
+          props.onDragStart?.();
+        }
         isDragging.current = true;
         setIsDragging(true);
 

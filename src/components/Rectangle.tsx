@@ -1,6 +1,6 @@
 import React, { DetailedHTMLProps, MouseEventHandler } from 'react';
 import { OnDragMouseDown } from '../types';
-import { captureClick, LEFT_MOUSE_BUTTON } from '../utils';
+import { LEFT_MOUSE_BUTTON } from '../utils';
 import styles from './ResizableBox.module.css';
 
 interface RectangleProps extends DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -17,7 +17,6 @@ export const Rectangle = (props: RectangleProps) => {
     if (e.button !== LEFT_MOUSE_BUTTON) return;
     e.preventDefault();
     e.stopPropagation();
-    captureClick();
     document.body.style.cursor = 'grabbing';
     onDragMouseDown?.(e);
   };

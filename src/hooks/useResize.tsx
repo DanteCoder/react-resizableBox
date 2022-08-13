@@ -12,7 +12,7 @@ import {
   StyleRot,
   StyleSize,
 } from '../types';
-import { center2TopLeft, deg2Rad, vectorLength, topLeft2Center, vectorAngle } from '../utils';
+import { center2TopLeft, deg2Rad, vectorLength, topLeft2Center, vectorAngle, captureClick } from '../utils';
 
 interface UseResizeProps {
   styles: StylePos & StyleSize & StyleRot;
@@ -60,7 +60,10 @@ const useResize = (props: UseResizeProps): [OnResizeMouseDown, boolean] => {
         e.stopImmediatePropagation();
         const { clientX, clientY } = e;
 
-        if (!isResizing.current) props.onResizeStart?.();
+        if (!isResizing.current) {
+          captureClick();
+          props.onResizeStart?.();
+        }
         isResizing.current = true;
         setIsResizing(true);
 

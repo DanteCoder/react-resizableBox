@@ -2,7 +2,7 @@ import React, { DetailedHTMLProps, MouseEventHandler } from 'react';
 import { OnRotateMouseDown } from '../types';
 import RotateArrow from '../icons/RotateArrow.svg';
 import styles from './ResizableBox.module.css';
-import { captureClick, LEFT_MOUSE_BUTTON } from '../utils';
+import { LEFT_MOUSE_BUTTON } from '../utils';
 
 interface RotateHandlerProps extends DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   rotationDeg: number;
@@ -16,7 +16,6 @@ export const RotateHandler = (props: RotateHandlerProps) => {
     if (e.button !== LEFT_MOUSE_BUTTON) return;
     e.preventDefault();
     e.stopPropagation();
-    captureClick();
     document.body.style.cursor = 'grabbing';
     onRotateMouseDown?.(e);
   };
