@@ -1,32 +1,56 @@
-import { MouseEventHandler, useCallback, useRef } from 'react';
-import { DeltaRot, OnRotateEndHandler, OnRotateHandler, OnRotateMouseDown, OnRotateStartHandler, StylePos, StyleRot, StyleSize } from '../types';
-import { deg2Rad, vectorAngle } from '../utils';
+import { RefObject, useCallback, useMemo, useRef, useState } from 'react';
+import {
+  DeltaPos,
+  DeltaRot,
+  OnRotateEndHandler,
+  OnRotateHandler,
+  OnRotateMouseDown,
+  OnRotateStartHandler,
+  StylePos,
+  StyleRot,
+  StyleSize,
+} from '../types';
+import { topLeft2Center, vectorAngle } from '../utils';
 
-interface Props {
+interface UseRotateProps {
   styles: StylePos & StyleSize & StyleRot;
-  topOffset: number;
+  resizableRef: RefObject<HTMLDivElement>;
+  snapAngle: number | boolean;
   onRotateStart?: OnRotateStartHandler;
   onRotate?: OnRotateHandler;
   onRotateEnd?: OnRotateEndHandler;
 }
 
-const useRotate = (props: Props) => {
+const useRotate = (props: UseRotateProps): [OnRotateMouseDown, boolean] => {
   const { styles } = props;
   const isMouseDown = useRef(false);
   const isRotating = useRef(false);
+  const resizableCenter = useRef({ x: 0, y: 0 });
   const startMousePos = useRef({ x: 0, y: 0 });
   const startStyles = useRef(styles);
   const newRotation = useRef(styles.rotationDeg);
   const prevRotation = useRef(styles.rotationDeg);
   const totalDelta = useRef<DeltaRot>({ deg: 0 });
 
-  const onMouseDown: MouseEventHandler<HTMLDivElement> = useCallback(
+  const [_isRotating, setIsRotating] = useState(false);
+
+  const snapAngle = useMemo((): number | undefined => {
+    if (typeof props.snapAngle === 'boolean') return undefined;
+    if (props.snapAngle === 0) return undefined;
+    return props.snapAngle;
+  }, []);
+
+  const onMouseDown: OnRotateMouseDown = useCallback(
     (e) => {
       isMouseDown.current = true;
       startMousePos.current = { x: e.clientX, y: e.clientY };
       startStyles.current = styles;
       prevRotation.current = styles.rotationDeg;
       totalDelta.current = { deg: 0 };
+
+      const clientRect = props.resizableRef.current?.getBoundingClientRect();
+      if (!clientRect) return;
+      resizableCenter.current = topLeft2Center(clientRect.y, clientRect.x, clientRect.width, clientRect.height);
 
       const onMouseMove = (e: MouseEvent) => {
         if (!isMouseDown.current) return;
@@ -36,13 +60,20 @@ const useRotate = (props: Props) => {
 
         if (!isRotating.current) props.onRotateStart?.();
         isRotating.current = true;
+        setIsRotating(true);
 
         const mouseDelta = {
-          deltaX: clientX - startMousePos.current.x,
-          deltaY: clientY - startMousePos.current.y,
+          x: clientX - startMousePos.current.x,
+          y: clientY - startMousePos.current.y,
         };
 
-        newRotation.current = getNewRotation(mouseDelta, startStyles.current, props.topOffset, e.shiftKey);
+        newRotation.current = getNewRotation(
+          startMousePos.current,
+          resizableCenter.current,
+          mouseDelta,
+          startStyles.current,
+          e.shiftKey ? snapAngle : undefined
+        );
 
         const delta = {
           deg: newRotation.current - prevRotation.current,
@@ -57,13 +88,15 @@ const useRotate = (props: Props) => {
         props.onRotate?.({ style: { rotationDeg: newRotation.current }, delta, totalDelta: totalDelta.current });
       };
 
-      const onMouseUp = (_e: MouseEvent) => {
+      const onMouseUp = () => {
         if (!isMouseDown.current) return;
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
         if (isRotating) props.onRotateEnd?.({ style: { rotationDeg: newRotation.current }, totalDelta: totalDelta.current });
         isMouseDown.current = false;
         isRotating.current = false;
+        setIsRotating(false);
+        document.body.style.cursor = 'auto';
       };
 
       document.addEventListener('mouseup', onMouseUp);
@@ -72,26 +105,27 @@ const useRotate = (props: Props) => {
     [props, styles]
   );
 
-  return [isMouseDown.current, onMouseDown] as [boolean, OnRotateMouseDown];
+  return [onMouseDown, _isRotating];
 };
 
-const getNewRotation = (
-  delta: { deltaX: number; deltaY: number },
-  styles: { top: number; left: number; width: number; height: number; rotationDeg: number },
-  offsetTop: number,
-  isShiftKey: boolean
-) => {
-  const rotationRad = deg2Rad(styles.rotationDeg);
-  const startX = (styles.height / 2 - offsetTop) * Math.sin(rotationRad);
-  const startY = -(styles.height / 2 - offsetTop) * Math.cos(rotationRad);
-  const endX = startX + delta.deltaX;
-  const endY = startY + delta.deltaY;
+const getNewRotation = (startMousePos: DeltaPos, rotationCenter: DeltaPos, mouseDelta: DeltaPos, startStyles: StyleRot, snapAngle?: number) => {
+  const startVector = {
+    x: startMousePos.x - rotationCenter.x,
+    y: startMousePos.y - rotationCenter.y,
+  };
+  const endVector = {
+    x: startVector.x + mouseDelta.x,
+    y: startVector.y + mouseDelta.y,
+  };
 
-  const deltaAngle = ((vectorAngle(endX, endY) - vectorAngle(startX, startY)) * 180) / Math.PI;
-  let newAngle = Math.round(deltaAngle + styles.rotationDeg);
+  const startVectorAngle = vectorAngle(startVector.x, startVector.y);
+  const endVectorAngle = vectorAngle(endVector.x, endVector.y);
+  const deltaAngle = ((endVectorAngle - startVectorAngle) * 180) / Math.PI;
 
-  if (isShiftKey) {
-    newAngle = Math.round(newAngle / 45) * 45;
+  let newAngle = Math.round(startStyles.rotationDeg + deltaAngle);
+
+  if (snapAngle != null) {
+    newAngle = Math.round(newAngle / snapAngle) * snapAngle;
   }
 
   return newAngle;

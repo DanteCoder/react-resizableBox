@@ -1,31 +1,24 @@
-import React, { CSSProperties, MouseEventHandler } from 'react';
+import React, { DetailedHTMLProps, MouseEventHandler } from 'react';
 import { ResizeHandlerType, OnResizeMouseDown } from '../types';
+import { captureClick, LEFT_MOUSE_BUTTON } from '../utils';
 import styles from './ResizableBox.module.css';
 
-interface Props {
-  left: number;
-  top: number;
+interface ResizeHandlerProps extends DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   type: ResizeHandlerType;
-  color?: CSSProperties['color'];
-  onMouseDown?: OnResizeMouseDown;
+  onResizeMouseDown?: OnResizeMouseDown;
 }
 
-export const ResizeHandler = (props: Props) => {
-  const { left, top, type, onMouseDown, color } = props;
+export const ResizeHandler = (props: ResizeHandlerProps) => {
+  const { style, type, onResizeMouseDown } = props;
 
   const onMouseDownHandler: MouseEventHandler<HTMLDivElement> = (e) => {
+    if (e.button !== LEFT_MOUSE_BUTTON) return;
+    e.preventDefault();
     e.stopPropagation();
-
-    const captureClick = (e: MouseEvent) => {
-      e.stopPropagation();
-      requestAnimationFrame(() => {
-        document.removeEventListener('click', captureClick, true);
-      });
-    };
-
-    document.addEventListener('click', captureClick, true);
-    onMouseDown?.(e, type);
+    captureClick();
+    document.body.style.cursor = style?.cursor ?? 'auto';
+    onResizeMouseDown?.(e, type);
   };
 
-  return <div onMouseDown={onMouseDownHandler} className={styles.resizeHandler} style={{ left, top, color }}></div>;
+  return <div className={styles.resizeHandler} {...props} onMouseDown={onMouseDownHandler} />;
 };

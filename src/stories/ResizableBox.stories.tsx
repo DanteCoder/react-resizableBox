@@ -1,13 +1,13 @@
 import React from 'react';
 import { useState } from 'react';
-import { ResizableBox, ResizableBoxProps } from '../components/ResizableBox';
+import { ResizableBox } from '../components/ResizableBox';
 import { OnDragHandler, OnResizeHandler, OnRotateHandler } from '../types';
 
 export default {
   component: ResizableBox,
 };
 
-export const SimpleUseCase = () => {
+const Template = (args) => {
   const [width, setWidth] = useState(100);
   const [height, setHeight] = useState(100);
   const [left, setLeft] = useState(100);
@@ -44,9 +44,7 @@ export const SimpleUseCase = () => {
         }}
       ></div>
       <ResizableBox
-        color={'red'}
-        svgFilter={'invert(10%) sepia(96%) saturate(3906%) hue-rotate(241deg) brightness(99%) contrast(161%)'}
-        dragHandler={true}
+        {...args}
         width={width}
         height={height}
         left={left}
@@ -59,3 +57,5 @@ export const SimpleUseCase = () => {
     </div>
   );
 };
+
+export const SimpleUse = Template.bind({});

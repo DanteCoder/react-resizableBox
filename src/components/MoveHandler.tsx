@@ -1,58 +1,37 @@
-import React, { MouseEventHandler, useEffect } from 'react';
+import React, { DetailedHTMLProps, MouseEventHandler } from 'react';
 import { OnDragMouseDown } from '../types';
 import MoveArrows from '../icons/MoveArrows.svg';
 import styles from './ResizableBox.module.css';
-import { CSSProperties } from 'react';
+import { captureClick, LEFT_MOUSE_BUTTON } from '../utils';
 
-interface Props {
-  left: number;
-  top: number;
+interface MoveHandlerProps extends DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   rotationDeg: number;
-  draggable: boolean;
-  isDragging: boolean;
-  onMouseDown: OnDragMouseDown;
-  svgFilter?: CSSProperties['filter'];
+  onDragMouseDown: OnDragMouseDown;
 }
 
-export const MoveHandler = (props: Props) => {
-  const { left, top, rotationDeg, draggable, isDragging, onMouseDown, svgFilter } = props;
-
-  useEffect(() => {
-    if (!isDragging) return;
-    const captureClick = (e: MouseEvent) => {
-      e.stopPropagation();
-      requestAnimationFrame(() => {
-        document.removeEventListener('click', captureClick, true);
-      });
-    };
-    document.addEventListener('click', captureClick, true);
-  }, [isDragging]);
+export const MoveHandler = (props: MoveHandlerProps) => {
+  const { style, rotationDeg, onDragMouseDown } = props;
 
   const onMouseDownHandler: MouseEventHandler<HTMLDivElement> = (e) => {
+    if (e.button !== LEFT_MOUSE_BUTTON) return;
     e.preventDefault();
     e.stopPropagation();
-
-    const captureClick = (e: MouseEvent) => {
-      e.stopPropagation();
-      requestAnimationFrame(() => {
-        document.removeEventListener('click', captureClick, true);
-      });
-    };
-
-    document.addEventListener('click', captureClick, true);
-    onMouseDown?.(e);
+    captureClick();
+    document.body.style.cursor = 'grabbing';
+    onDragMouseDown?.(e);
   };
+
   return (
     <div
-      onMouseDown={draggable ? onMouseDownHandler : undefined}
       className={styles.moveHandler}
+      {...props}
       style={{
-        left,
-        top,
         transform: `translate(-50%, -50%) rotate(${-rotationDeg}deg)`,
+        ...style,
       }}
+      onMouseDown={onMouseDownHandler}
     >
-      <img style={{ filter: svgFilter }} src={MoveArrows} alt="Move" />
+      <img src={MoveArrows} alt="Move" />
     </div>
   );
 };

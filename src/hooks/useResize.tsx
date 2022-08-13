@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useRef } from 'react';
 import {
   DeltaPos,
@@ -12,21 +12,21 @@ import {
   StyleRot,
   StyleSize,
 } from '../types';
-import { center2TopLeft, deg2Rad, deltaLength, topLeft2Center, vectorAngle } from '../utils';
+import { center2TopLeft, deg2Rad, vectorLength, topLeft2Center, vectorAngle } from '../utils';
 
-interface Props {
+interface UseResizeProps {
   styles: StylePos & StyleSize & StyleRot;
   scale: number;
-  minWidth?: number;
-  minHeight?: number;
-  aspectRatio?: boolean | number;
+  minWidth: number;
+  minHeight: number;
+  aspectRatio: number | boolean;
   onResizeStart?: OnResizeStartHandler;
   onResize?: OnResizeHandler;
   onResizeEnd?: OnResizeEndHandler;
 }
 
-const useResize = (props: Props) => {
-  const { styles, scale, minWidth = 10, minHeight = 10, aspectRatio = false } = props;
+const useResize = (props: UseResizeProps): [OnResizeMouseDown, boolean] => {
+  const { styles, scale, minWidth, minHeight } = props;
   const isMouseDown = useRef(false);
   const isResizing = useRef(false);
   const handlerType = useRef<ResizeHandlerType>('n');
@@ -34,6 +34,14 @@ const useResize = (props: Props) => {
   const startStyle = useRef(styles);
   const prevStyle = useRef<StylePos & StyleSize>(styles);
   const stylesTotalDelta = useRef<DeltaPos & DeltaSize>({ x: 0, y: 0, w: 0, h: 0 });
+
+  const [_isResizing, setIsResizing] = useState(false);
+
+  const aspectRatio = useMemo(() => {
+    if (typeof props.aspectRatio === 'boolean') return props.aspectRatio;
+    if (props.aspectRatio === 0) return false;
+    return props.aspectRatio;
+  }, []);
 
   const onMouseDown: OnResizeMouseDown = useCallback(
     (e, type) => {
@@ -54,6 +62,7 @@ const useResize = (props: Props) => {
 
         if (!isResizing.current) props.onResizeStart?.();
         isResizing.current = true;
+        setIsResizing(true);
 
         const mouseDelta = {
           x: (clientX - startMousePos.current.x) / scale,
@@ -81,13 +90,15 @@ const useResize = (props: Props) => {
         props.onResize?.({ style: newStyle, delta: stylesDelta, totalDelta: stylesTotalDelta.current });
       };
 
-      const onMouseUp = (_e: MouseEvent) => {
+      const onMouseUp = () => {
         if (!isMouseDown.current) return;
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
         if (isResizing.current) props.onResizeEnd?.({ style: prevStyle.current, totalDelta: stylesTotalDelta.current });
         isMouseDown.current = false;
         isResizing.current = false;
+        setIsResizing(false);
+        document.body.style.cursor = 'auto';
       };
 
       document.addEventListener('mouseup', onMouseUp);
@@ -96,7 +107,7 @@ const useResize = (props: Props) => {
     [aspectRatio, minHeight, minWidth, props, scale, styles]
   );
 
-  return [isMouseDown.current, onMouseDown] as [boolean, OnResizeMouseDown];
+  return [onMouseDown, _isResizing];
 };
 
 const getNewStyle = (
@@ -105,10 +116,10 @@ const getNewStyle = (
   mouseDelta: DeltaPos,
   minWidth: number,
   minHeight: number,
-  aspectRatio: boolean | number,
+  aspectRatio: number | boolean,
   symetrical: boolean
 ): StylePos & StyleSize => {
-  const deltaL = deltaLength(mouseDelta.x, mouseDelta.y);
+  const deltaL = vectorLength(mouseDelta.x, mouseDelta.y);
   const alpha = vectorAngle(mouseDelta.x, mouseDelta.y);
   const rotationRad = deg2Rad(initStyle.rotationDeg);
   const relativeAngle = alpha - rotationRad;
@@ -133,17 +144,29 @@ const getNewStyle = (
     if (type.match(/n|s/)) deltaHeight *= 2;
   })();
 
-  const resizeRatio = typeof aspectRatio === 'number' ? aspectRatio : initStyle.width / initStyle.height;
+  const resizeRatio = (() => {
+    if (typeof aspectRatio === 'number') return aspectRatio;
+    return initStyle.width / initStyle.height;
+  })();
 
-  // Apply aspect ratio
+  // Apply resize aspect ratio
   (() => {
     if (!aspectRatio) return;
-    if (type.match(/n|s/)) deltaWidth = deltaHeight * resizeRatio;
+
     if (type.match(/w|e/)) deltaHeight = deltaWidth / resizeRatio;
+    if (type.match(/n|s/)) deltaWidth = deltaHeight * resizeRatio;
   })();
 
   let newWidth = Math.abs(initStyle.width + deltaWidth);
-  let newHeight = typeof aspectRatio !== 'number' ? Math.abs(initStyle.height + deltaHeight) : newWidth * resizeRatio;
+  let newHeight = Math.abs(initStyle.height + deltaHeight);
+
+  // Apply size aspect ratio
+  (() => {
+    if (!aspectRatio) return;
+
+    if (type.match(/w|e/)) newHeight = newWidth / resizeRatio;
+    if (type.match(/n|s/)) newWidth = newHeight * resizeRatio;
+  })();
 
   // Constrain new size to minWidth and minHeight
   (() => {
