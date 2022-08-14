@@ -3,6 +3,7 @@
   "name": "@dantecoder/react-resizablebox",
   "version": "1.0.1",
   "description": "A React resizable, draggable, rotatable box",
+  "repository": "github:DanteCoder/react-resizableBox",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "files": [
