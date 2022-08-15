@@ -1,7 +1,8 @@
 # React Resizable Box
 
-[![npm](https://img.shields.io/npm/v/@dantecoder/react-resizablebox.svg)](https://www.npmjs.com/package/@dantecoder/react-resizablebox)
-[![NPM](https://img.shields.io/npm/l/@dantecoder/react-resizablebox.svg)](https://github.com/DanteCoder/react-resizableBox/blob/main/LICENSE)
+[<img src="https://img.shields.io/npm/v/@dantecoder/react-resizablebox.svg"/>](https://www.npmjs.com/package/@dantecoder/react-resizablebox)
+[<img src="https://img.shields.io/npm/l/@dantecoder/react-resizablebox.svg"/>](https://github.com/DanteCoder/react-resizableBox/blob/main/LICENSE)
+[<img src="https://img.shields.io/badge/code%20style-prettier-ff69b4.svg"/>](https://github.com/prettier/prettier)
 
 A resizable, draggable, rotatable React widget.
 
