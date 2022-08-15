@@ -131,9 +131,8 @@ export const ResizableBox = (props: ResizableBoxProps) => {
         handlersOffset + offsets.left,
         handlersOffset + offsets.top
       ),
-      transition: isResizing ? 'unset' : undefined,
     };
-  }, [isRotating, isResizing, width, height, rotateHandlerDeg, relativeHandlers, handlersOffset, offsets]);
+  }, [isRotating, width, height, rotateHandlerDeg, relativeHandlers, handlersOffset, offsets]);
 
   const dragHandlerPos = useMemo(() => {
     return {
@@ -144,9 +143,8 @@ export const ResizableBox = (props: ResizableBoxProps) => {
         handlersOffset + offsets.left,
         handlersOffset + offsets.top
       ),
-      transition: isResizing ? 'unset' : undefined,
     };
-  }, [isRotating, isResizing, width, height, dragHandlerDeg, relativeHandlers, handlersOffset, offsets]);
+  }, [isRotating, width, height, dragHandlerDeg, relativeHandlers, handlersOffset, offsets]);
 
   const dragCursor = useMemo((): CSSProperties['cursor'] => {
     if (!draggable || isResizing || isRotating) return;

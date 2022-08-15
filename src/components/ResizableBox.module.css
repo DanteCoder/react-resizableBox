@@ -24,8 +24,6 @@
   position: absolute;
   width: 30px;
   height: 30px;
-  transition: ease 0.3s;
-  transition-property: left, top;
   fill: rgba(30, 70, 255, 1);
 }
 
@@ -38,8 +36,6 @@
   position: absolute;
   width: 30px;
   height: 30px;
-  transition: ease 0.3s;
-  transition-property: left, top;
   fill: rgba(30, 70, 255, 1);
 }
 
