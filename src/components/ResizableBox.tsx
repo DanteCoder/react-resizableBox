@@ -29,7 +29,6 @@ export interface ResizableBoxProps extends Omit<DetailedHTMLProps<React.HTMLAttr
   rotationDeg?: number;
   scale?: number;
   color?: CSSProperties['color'];
-  svgFilter?: CSSProperties['filter'];
   draggable?: boolean;
   dragHandler?: boolean;
   dragHandlerDeg?: number;
@@ -63,7 +62,6 @@ export const ResizableBox = (props: ResizableBoxProps) => {
     rotationDeg = 0,
     scale = 1,
     color,
-    svgFilter,
     draggable = true,
     dragHandler = false,
     dragHandlerDeg = 180,
@@ -133,9 +131,8 @@ export const ResizableBox = (props: ResizableBoxProps) => {
         handlersOffset + offsets.left,
         handlersOffset + offsets.top
       ),
-      transition: isResizing ? 'unset' : undefined,
     };
-  }, [isRotating, isResizing, width, height, rotateHandlerDeg, relativeHandlers, handlersOffset, offsets]);
+  }, [isRotating, width, height, rotateHandlerDeg, relativeHandlers, handlersOffset, offsets]);
 
   const dragHandlerPos = useMemo(() => {
     return {
@@ -146,9 +143,8 @@ export const ResizableBox = (props: ResizableBoxProps) => {
         handlersOffset + offsets.left,
         handlersOffset + offsets.top
       ),
-      transition: isResizing ? 'unset' : undefined,
     };
-  }, [isRotating, isResizing, width, height, dragHandlerDeg, relativeHandlers, handlersOffset, offsets]);
+  }, [isRotating, width, height, dragHandlerDeg, relativeHandlers, handlersOffset, offsets]);
 
   const dragCursor = useMemo((): CSSProperties['cursor'] => {
     if (!draggable || isResizing || isRotating) return;
@@ -187,7 +183,7 @@ export const ResizableBox = (props: ResizableBoxProps) => {
         <MoveHandler
           style={{
             ...dragHandlerPos,
-            filter: svgFilter,
+            fill: color,
             cursor: dragCursor,
           }}
           rotationDeg={rotationDeg}
@@ -242,7 +238,7 @@ export const ResizableBox = (props: ResizableBoxProps) => {
         <RotateHandler
           style={{
             ...rotateHandlerPos,
-            filter: svgFilter,
+            fill: color,
             cursor: rotateCursor,
           }}
           rotationDeg={rotationDeg}
