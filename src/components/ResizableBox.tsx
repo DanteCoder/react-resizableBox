@@ -29,7 +29,6 @@ export interface ResizableBoxProps extends Omit<DetailedHTMLProps<React.HTMLAttr
   rotationDeg?: number;
   scale?: number;
   color?: CSSProperties['color'];
-  svgFilter?: CSSProperties['filter'];
   draggable?: boolean;
   dragHandler?: boolean;
   dragHandlerDeg?: number;
@@ -63,7 +62,6 @@ export const ResizableBox = (props: ResizableBoxProps) => {
     rotationDeg = 0,
     scale = 1,
     color,
-    svgFilter,
     draggable = true,
     dragHandler = false,
     dragHandlerDeg = 180,
@@ -187,7 +185,7 @@ export const ResizableBox = (props: ResizableBoxProps) => {
         <MoveHandler
           style={{
             ...dragHandlerPos,
-            filter: svgFilter,
+            fill: color,
             cursor: dragCursor,
           }}
           rotationDeg={rotationDeg}
@@ -242,7 +240,7 @@ export const ResizableBox = (props: ResizableBoxProps) => {
         <RotateHandler
           style={{
             ...rotateHandlerPos,
-            filter: svgFilter,
+            fill: color,
             cursor: rotateCursor,
           }}
           rotationDeg={rotationDeg}

@@ -1,6 +1,6 @@
 import React, { DetailedHTMLProps, MouseEventHandler } from 'react';
 import { OnDragMouseDown } from '../types';
-import MoveArrows from '../icons/MoveArrows.svg';
+import { MoveArrows } from '../icons/MoveArrows';
 import styles from './ResizableBox.module.css';
 import { LEFT_MOUSE_BUTTON } from '../utils';
 
@@ -30,7 +30,7 @@ export const MoveHandler = (props: MoveHandlerProps) => {
       }}
       onMouseDown={onMouseDownHandler}
     >
-      <img src={MoveArrows} alt="Move" />
+      <MoveArrows />
     </div>
   );
 };

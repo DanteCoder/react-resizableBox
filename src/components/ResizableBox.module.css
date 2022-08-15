@@ -26,12 +26,12 @@
   height: 30px;
   transition: ease 0.3s;
   transition-property: left, top;
+  fill: rgba(30, 70, 255, 1);
 }
 
-.rotateHandler img {
+.rotateHandler svg {
   width: 100%;
   height: 100%;
-  filter: invert(10%) sepia(96%) saturate(3906%) hue-rotate(241deg) brightness(119%) contrast(161%);
 }
 
 .moveHandler {
@@ -40,10 +40,10 @@
   height: 30px;
   transition: ease 0.3s;
   transition-property: left, top;
+  fill: rgba(30, 70, 255, 1);
 }
 
-.moveHandler img {
+.moveHandler svg {
   width: 100%;
   height: 100%;
-  filter: invert(10%) sepia(96%) saturate(3906%) hue-rotate(241deg) brightness(119%) contrast(161%);
 }

@@ -1,6 +1,6 @@
 import React, { DetailedHTMLProps, MouseEventHandler } from 'react';
 import { OnRotateMouseDown } from '../types';
-import RotateArrow from '../icons/RotateArrow.svg';
+import { RotateArrow } from '../icons/RotateArrow';
 import styles from './ResizableBox.module.css';
 import { LEFT_MOUSE_BUTTON } from '../utils';
 
@@ -30,7 +30,7 @@ export const RotateHandler = (props: RotateHandlerProps) => {
       }}
       onMouseDown={onMouseDownHandler}
     >
-      <img src={RotateArrow} alt="Rotate" />
+      <RotateArrow />
     </div>
   );
 };
