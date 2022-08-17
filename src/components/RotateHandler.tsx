@@ -15,7 +15,6 @@ export const RotateHandler = (props: RotateHandlerProps) => {
   const onMouseDownHandler: MouseEventHandler<HTMLDivElement> = (e) => {
     if (e.button !== LEFT_MOUSE_BUTTON) return;
     e.preventDefault();
-    e.stopPropagation();
     document.body.style.cursor = 'grabbing';
     onRotateMouseDown?.(e);
   };

@@ -16,7 +16,6 @@ export const Rectangle = (props: RectangleProps) => {
   const onMouseDownHandler: MouseEventHandler<HTMLDivElement> = (e) => {
     if (e.button !== LEFT_MOUSE_BUTTON) return;
     e.preventDefault();
-    e.stopPropagation();
     document.body.style.cursor = 'grabbing';
     onDragMouseDown?.(e);
   };

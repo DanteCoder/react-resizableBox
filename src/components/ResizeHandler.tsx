@@ -14,7 +14,6 @@ export const ResizeHandler = (props: ResizeHandlerProps) => {
   const onMouseDownHandler: MouseEventHandler<HTMLDivElement> = (e) => {
     if (e.button !== LEFT_MOUSE_BUTTON) return;
     e.preventDefault();
-    e.stopPropagation();
     document.body.style.cursor = style?.cursor ?? 'auto';
     onResizeMouseDown?.(e, type);
   };
