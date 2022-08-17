@@ -1,7 +1,7 @@
 {
   "author": "Dante Barboza",
   "name": "@dantecoder/react-resizablebox",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A React resizable, draggable, rotatable box",
   "repository": "github:DanteCoder/react-resizableBox",
   "keywords": [
@@ -22,7 +22,7 @@
     "build": "rm -rf dist/ && prettier --write src/ && npm run build:esm && npm run build:cjs && npm run copy-assets",
     "build:esm": "tsc",
     "build:cjs": "tsc --module CommonJS --outDir dist/cjs",
-    "copy-assets": "copyfiles -u 1 src/icons/*.svg dist/esm/ && copyfiles -u 1 src/icons/*.svg dist/cjs/ && copyfiles -u 1 src/**/*.css dist/cjs/ && copyfiles -u 1 src/**/*.css dist/esm/",
+    "copy-assets": "copyfiles -u 1 src/**/*.css dist/cjs/ && copyfiles -u 1 src/**/*.css dist/esm/",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
