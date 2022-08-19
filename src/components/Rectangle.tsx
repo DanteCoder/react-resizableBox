@@ -5,13 +5,11 @@ import styles from './ResizableBox.module.css';
 
 interface RectangleProps extends DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   draggable: boolean;
-  onDragMouseDown?: OnDragMouseDown;
-  onClick?: MouseEventHandler<HTMLDivElement>;
-  onDoubleClick?: MouseEventHandler<HTMLDivElement>;
+  onDragMouseDown: OnDragMouseDown;
 }
 
 export const Rectangle = (props: RectangleProps) => {
-  const { draggable, onDragMouseDown } = props;
+  const { draggable, onDragMouseDown, ...htmlProps } = props;
 
   const onMouseDownHandler: MouseEventHandler<HTMLDivElement> = (e) => {
     if (e.button !== LEFT_MOUSE_BUTTON) return;
@@ -20,5 +18,5 @@ export const Rectangle = (props: RectangleProps) => {
     onDragMouseDown?.(e);
   };
 
-  return <div className={styles.rectangle} {...props} onMouseDown={draggable ? onMouseDownHandler : undefined} />;
+  return <div className={styles.rectangle} {...htmlProps} onMouseDown={draggable ? onMouseDownHandler : undefined} />;
 };

@@ -9,14 +9,14 @@ interface ResizeHandlerProps extends DetailedHTMLProps<React.HTMLAttributes<HTML
 }
 
 export const ResizeHandler = (props: ResizeHandlerProps) => {
-  const { style, type, onResizeMouseDown } = props;
+  const { type, onResizeMouseDown, ...htmlProps } = props;
 
   const onMouseDownHandler: MouseEventHandler<HTMLDivElement> = (e) => {
     if (e.button !== LEFT_MOUSE_BUTTON) return;
     e.preventDefault();
-    document.body.style.cursor = style?.cursor ?? 'auto';
+    document.body.style.cursor = props.style?.cursor ?? 'auto';
     onResizeMouseDown?.(e, type);
   };
 
-  return <div className={styles.resizeHandler} {...props} onMouseDown={onMouseDownHandler} />;
+  return <div className={styles.resizeHandler} {...htmlProps} onMouseDown={onMouseDownHandler} />;
 };
