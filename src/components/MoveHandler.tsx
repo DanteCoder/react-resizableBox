@@ -10,7 +10,7 @@ interface MoveHandlerProps extends DetailedHTMLProps<React.HTMLAttributes<HTMLDi
 }
 
 export const MoveHandler = (props: MoveHandlerProps) => {
-  const { style, rotationDeg, onDragMouseDown } = props;
+  const { rotationDeg, onDragMouseDown, ...htmlProps } = props;
 
   const onMouseDownHandler: MouseEventHandler<HTMLDivElement> = (e) => {
     if (e.button !== LEFT_MOUSE_BUTTON) return;
@@ -22,10 +22,10 @@ export const MoveHandler = (props: MoveHandlerProps) => {
   return (
     <div
       className={styles.moveHandler}
-      {...props}
+      {...htmlProps}
       style={{
         transform: `translate(-50%, -50%) rotate(${-rotationDeg}deg)`,
-        ...style,
+        ...htmlProps.style,
       }}
       onMouseDown={onMouseDownHandler}
     >
