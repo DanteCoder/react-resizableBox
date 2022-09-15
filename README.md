@@ -116,14 +116,14 @@ The types used in each property are the following:
 | `DeltaSize` | `{ w: number; h: number }`          |
 | `DeltaRot`  | `{ deg: number }`                   |
 
-| Handler                | Event                                                                                            |
-| ---------------------- | ------------------------------------------------------------------------------------------------ |
-| `OnDragStartHandler`   | -                                                                                                |
-| `OnDragHandler`        | `{ style: StylePos; delta: DeltaPos; totalDelta: DeltaPos }`                                     |
-| `OnDragEndHandler`     | `{ style: StylePos; totalDelta: DeltaPos }`                                                      |
-| `OnResizeStartHandler` | -                                                                                                |
-| `OnResizeHandler`      | `{ style: StylePos & StyleSize; delta: DeltaPos & DeltaSize; totalDelta: DeltaPos & DeltaSize }` |
-| `OnResizeEndHandler`   | `{ style: StylePos & StyleSize; totalDelta: DeltaPos & DeltaSize }`                              |
-| `OnRotateStartHandler` | -                                                                                                |
-| `OnRotateHandler`      | `{ style: StyleRot; delta: DeltaRot; totalDelta: DeltaRot }`                                     |
-| `OnRotateEndHandler`   | `{ style: StyleRot; totalDelta: DeltaRot }`                                                      |
+| Handler                | Event                                                                                                                     |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `OnDragStartHandler`   | -                                                                                                                         |
+| `OnDragHandler`        | `{ style: StylePos; delta: DeltaPos; totalDelta: DeltaPos, nativeEvent: MouseEvent }`                                     |
+| `OnDragEndHandler`     | `{ style: StylePos; totalDelta: DeltaPos, nativeEvent: MouseEvent }`                                                      |
+| `OnResizeStartHandler` | -                                                                                                                         |
+| `OnResizeHandler`      | `{ style: StylePos & StyleSize; delta: DeltaPos & DeltaSize; totalDelta: DeltaPos & DeltaSize, nativeEvent: MouseEvent }` |
+| `OnResizeEndHandler`   | `{ style: StylePos & StyleSize; totalDelta: DeltaPos & DeltaSize, nativeEvent: MouseEvent }`                              |
+| `OnRotateStartHandler` | -                                                                                                                         |
+| `OnRotateHandler`      | `{ style: StyleRot; delta: DeltaRot; totalDelta: DeltaRot, nativeEvent: MouseEvent }`                                     |
+| `OnRotateEndHandler`   | `{ style: StyleRot; totalDelta: DeltaRot, nativeEvent: MouseEvent }`                                                      |

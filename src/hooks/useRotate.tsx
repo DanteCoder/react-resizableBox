@@ -88,14 +88,14 @@ const useRotate = (props: UseRotateProps): [OnRotateMouseDown, boolean] => {
           deg: newRotation.current - startStyles.current.rotationDeg,
         };
 
-        props.onRotate?.({ style: { rotationDeg: newRotation.current }, delta, totalDelta: totalDelta.current });
+        props.onRotate?.({ style: { rotationDeg: newRotation.current }, delta, totalDelta: totalDelta.current, nativeEvent: e });
       };
 
-      const onMouseUp = () => {
+      const onMouseUp = (e: MouseEvent) => {
         if (!isMouseDown.current) return;
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
-        if (isRotating) props.onRotateEnd?.({ style: { rotationDeg: newRotation.current }, totalDelta: totalDelta.current });
+        if (isRotating) props.onRotateEnd?.({ style: { rotationDeg: newRotation.current }, totalDelta: totalDelta.current, nativeEvent: e });
         isMouseDown.current = false;
         isRotating.current = false;
         setIsRotating(false);

@@ -67,14 +67,14 @@ const useDrag = (props: UseDragProps): [OnDragMouseDown, boolean] => {
           top: Math.round(startStyles.current.top + totalPosDelta.current.y),
         };
 
-        props.onDrag?.({ style: newStyle.current, delta: mouseDelta, totalDelta: totalPosDelta.current });
+        props.onDrag?.({ style: newStyle.current, delta: mouseDelta, totalDelta: totalPosDelta.current, nativeEvent: e });
       };
 
-      const onMouseUp = () => {
+      const onMouseUp = (e: MouseEvent) => {
         if (!isMouseDown.current) return;
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
-        if (isDragging.current) props.onDragEnd?.({ style: newStyle.current, totalDelta: totalPosDelta.current });
+        if (isDragging.current) props.onDragEnd?.({ style: newStyle.current, totalDelta: totalPosDelta.current, nativeEvent: e });
         isMouseDown.current = false;
         isDragging.current = false;
         setIsDragging(false);

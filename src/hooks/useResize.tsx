@@ -90,14 +90,14 @@ const useResize = (props: UseResizeProps): [OnResizeMouseDown, boolean] => {
           h: newStyle.height - startStyle.current.height,
         };
 
-        props.onResize?.({ style: newStyle, delta: stylesDelta, totalDelta: stylesTotalDelta.current });
+        props.onResize?.({ style: newStyle, delta: stylesDelta, totalDelta: stylesTotalDelta.current, nativeEvent: e });
       };
 
-      const onMouseUp = () => {
+      const onMouseUp = (e: MouseEvent) => {
         if (!isMouseDown.current) return;
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
-        if (isResizing.current) props.onResizeEnd?.({ style: prevStyle.current, totalDelta: stylesTotalDelta.current });
+        if (isResizing.current) props.onResizeEnd?.({ style: prevStyle.current, totalDelta: stylesTotalDelta.current, nativeEvent: e });
         isMouseDown.current = false;
         isResizing.current = false;
         setIsResizing(false);
