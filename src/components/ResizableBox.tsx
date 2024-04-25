@@ -21,7 +21,11 @@ import { RotateHandler } from './RotateHandler';
 import { getParametricPos, getResizeCursors } from '../utils';
 import styles from './ResizableBox.module.css';
 
-export interface ResizableBoxProps extends Omit<DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>, 'onDrag' | 'onDragEnd'> {
+export interface ResizableBoxProps
+  extends Omit<
+    DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>,
+    'onDrag' | 'onDragEnd' | 'onResize' | 'onResizeEnd' | 'onRotate' | 'onRotateEnd'
+  > {
   width: number;
   height: number;
   left: number;
