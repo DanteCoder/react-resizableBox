@@ -6,12 +6,18 @@
 
 A resizable, draggable, rotatable React widget.
 
-Tested on React 17.0.2.
-
 ## installation
+
+React 18 or higher:
 
 ```bash
 npm install --save @dantecoder/react-resizablebox
+```
+
+React 17:
+
+```bash
+npm install --save @dantecoder/react-resizablebox@1.2.0
 ```
 
 ## Usage
@@ -19,7 +25,7 @@ npm install --save @dantecoder/react-resizablebox
 ```tsx
 import React from 'react';
 import { ResizableBox } from '@dantecoder/react-resizablebox';
-import { OnDragHandler, OnResizeHandler, OnRotateHandler } from '@dantecoder/react-resizablebox/dist/cjs/types';
+import { OnDragHandler, OnResizeHandler, OnRotateHandler } from '@dantecoder/react-resizablebox';
 
 const App = () => {
   const [width, setWidth] = useState(100);
