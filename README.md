@@ -8,16 +8,8 @@ A resizable, draggable, rotatable React widget.
 
 ## installation
 
-React 18 or higher:
-
 ```bash
 npm install --save @dantecoder/react-resizablebox
-```
-
-React 17:
-
-```bash
-npm install --save @dantecoder/react-resizablebox@1.2.0
 ```
 
 ## Usage
