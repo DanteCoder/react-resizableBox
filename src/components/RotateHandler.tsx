@@ -5,12 +5,11 @@ import styles from './ResizableBox.module.css';
 import { LEFT_MOUSE_BUTTON } from '../utils';
 
 interface RotateHandlerProps extends DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
-  rotationDeg: number;
   onRotateMouseDown?: OnRotateMouseDown;
 }
 
 export const RotateHandler = (props: RotateHandlerProps) => {
-  const { rotationDeg, onRotateMouseDown, ...htmlProps } = props;
+  const { onRotateMouseDown, ...htmlProps } = props;
 
   const onMouseDownHandler: MouseEventHandler<HTMLDivElement> = (e) => {
     if (e.button !== LEFT_MOUSE_BUTTON) return;
@@ -24,7 +23,7 @@ export const RotateHandler = (props: RotateHandlerProps) => {
       className={styles.rotateHandler}
       {...htmlProps}
       style={{
-        transform: `translate(-50%, -50%) rotate(${-rotationDeg}deg)`,
+        transform: `translate(-50%, -50%)`,
         ...props.style,
       }}
       onMouseDown={onMouseDownHandler}
