@@ -1,7 +1,7 @@
 {
   "author": "Dante Barboza",
   "name": "@dantecoder/react-resizablebox",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "A React resizable, draggable, rotatable box",
   "repository": "github:DanteCoder/react-resizableBox",
   "keywords": [
@@ -57,8 +57,8 @@
   },
   "peerDependencies": {
     "classnames": "^2.3.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react": ">17.0.2",
+    "react-dom": ">17.0.2"
   },
   "dependencies": {
     "classnames": "^2.3.1"
