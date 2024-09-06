@@ -1,18 +1,17 @@
-import { useCallback, useMemo, useState } from 'react';
-import { useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import {
   DeltaPos,
   DeltaSize,
-  ResizeHandlerType,
-  OnResizeHandler,
   OnResizeEndHandler,
+  OnResizeHandler,
   OnResizeMouseDown,
   OnResizeStartHandler,
+  ResizeHandlerType,
   StylePos,
   StyleRot,
   StyleSize,
 } from '../types';
-import { center2TopLeft, deg2Rad, vectorLength, topLeft2Center, vectorAngle, captureClick } from '../utils';
+import { captureClick, center2TopLeft, deg2Rad, topLeft2Center, vectorAngle, vectorLength } from '../utils';
 
 interface UseResizeProps {
   styles: StylePos & StyleSize & StyleRot;
@@ -62,7 +61,9 @@ const useResize = (props: UseResizeProps): [OnResizeMouseDown, boolean] => {
 
         if (!isResizing.current) {
           captureClick();
-          props.onResizeStart?.();
+          props.onResizeStart?.({
+            resizeDirection: handlerType.current,
+          });
         }
         isResizing.current = true;
         setIsResizing(true);
@@ -90,14 +91,26 @@ const useResize = (props: UseResizeProps): [OnResizeMouseDown, boolean] => {
           h: newStyle.height - startStyle.current.height,
         };
 
-        props.onResize?.({ style: newStyle, delta: stylesDelta, totalDelta: stylesTotalDelta.current, nativeEvent: e });
+        props.onResize?.({
+          style: newStyle,
+          delta: stylesDelta,
+          totalDelta: stylesTotalDelta.current,
+          resizeDirection: handlerType.current,
+          nativeEvent: e,
+        });
       };
 
       const onMouseUp = (e: MouseEvent) => {
         if (!isMouseDown.current) return;
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
-        if (isResizing.current) props.onResizeEnd?.({ style: prevStyle.current, totalDelta: stylesTotalDelta.current, nativeEvent: e });
+        if (isResizing.current)
+          props.onResizeEnd?.({
+            style: prevStyle.current,
+            totalDelta: stylesTotalDelta.current,
+            resizeDirection: handlerType.current,
+            nativeEvent: e,
+          });
         isMouseDown.current = false;
         isResizing.current = false;
         setIsResizing(false);
